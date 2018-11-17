@@ -11,7 +11,7 @@
 
 // common modules
 import * as Logger from "../../Logger/Logger.js";
-import * as CommonMessages from "/common/modules/MessageHandler/CommonMessages.js";
+import * as CommonMessages from "../../MessageHandler/CommonMessages.js";
 
 // import internal modules
 import * as Trigger from "./Trigger.js";

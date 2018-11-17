@@ -3,11 +3,11 @@ import "https://unpkg.com/chai@4.1.2/chai.js"; /* globals chai */
 import "https://unpkg.com/sinon@6.1.5/pkg/sinon.js"; /* globals sinon */
 
 // only for reset button tests
-import * as CommonMessages from "../MessageHandler/CommonMessages.js";
-import * as CustomMessages from "../MessageHandler/CustomMessages.js";
+import * as CommonMessages from "../../MessageHandler/CommonMessages.js";
+import * as CustomMessages from "../../MessageHandler/CustomMessages.js";
 
 import * as AutomaticSettings from "../AutomaticSettings.js";
-
+//
 import * as AddonSettingsStub from "./helper/AddonSettingsStub.js";
 import * as HtmlMock from "./helper/HtmlMock.js";
 import {wait} from "./helper/PromiseHelper.js";
@@ -77,7 +77,7 @@ describe("options module: AutomaticSettings", function () {
 
     describe("setDefaultOptionProvider()", function () {
         it("throws if setDefaultOptionProvider is not set before .init is called", function () {
-            chai.assert.throws(AutomaticSettings.init, Error, "Default option provider is not set. You need to call setDefaultOptionProvider() before .init() to set it.");
+            chai.assert.throws(AutomaticSettings.init, Error, "Default option provider is not set. You need to call .setDefaultOptionProvider() before .init() to set it.");
         });
 
         it("uses default value if value is not saved in settings", async function () {
