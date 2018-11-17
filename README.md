@@ -1,4 +1,6 @@
-# AutomaticSettings.js
+# TinyWebEx AutomaticSettings
+
+A simple module that allows you to specify your add-on settings in HTML-only, so you can focus on adding settings and not care about how to load and save them.
 
 ## API note
 

@@ -3,10 +3,10 @@ import "https://unpkg.com/chai@4.1.2/chai.js"; /* globals chai */
 import "https://unpkg.com/sinon@6.1.5/pkg/sinon.js"; /* globals sinon */
 
 // only for reset button tests
-import * as CommonMessages from "/common/modules/MessageHandler/CommonMessages.js";
-import * as CustomMessages from "/common/modules/MessageHandler/CustomMessages.js";
+import * as CommonMessages from "../MessageHandler/CommonMessages.js";
+import * as CustomMessages from "../MessageHandler/CustomMessages.js";
 
-import * as AutomaticSettings from "/options/modules/AutomaticSettings/AutomaticSettings.js";
+import * as AutomaticSettings from "../AutomaticSettings.js";
 
 import * as AddonSettingsStub from "./helper/AddonSettingsStub.js";
 import * as HtmlMock from "./helper/HtmlMock.js";

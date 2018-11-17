@@ -1,0 +1,26 @@
+{
+  "manifest_version": 2,
+  "name": "TinyWebEx AutomaticSettings library dev example",
+  "short_name": "TinyWebEx AutomaticSettings",
+  "version": "1.0",
+  "author": "rugk",
+
+  "description": "A simple module that allows you to specify your add-on settings in HTML-only, so you can focus on adding settings and not care about how to load and save them.",
+  "homepage_url": "https://github.com/TinyWebEx/AutomaticSettings",
+
+  // only for the unit test, we need to load libraries from CDNs
+  "content_security_policy": "default-src 'none'; style-src 'self' https://unpkg.com; script-src 'self' https://unpkg.com",
+
+  "permissions": [
+    // because it requires AddonSettings through Logger, MessageHandler etc.
+    "storage"
+  ],
+  "applications": {
+    "gecko": {
+      //ID required, because of storage permission
+      "id": "exampleId@rugk.github.io",
+      // minimum version, because of module system
+      "strict_min_version": "60.0a1"
+    }
+  }
+}

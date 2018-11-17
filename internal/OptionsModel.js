@@ -103,7 +103,7 @@ export async function getOption(option) {
  */
 export function verifyItIsReady() {
     if (defaultOptionGetter === undefined) {
-        throw new Error("Default option provider is not set. You need to call setDefaultOptionProvider() before .init() to set it.");
+        throw new Error("Default option provider is not set. You need to call .setDefaultOptionProvider() before .init() to set it.");
     }
 
     return true;
