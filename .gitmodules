@@ -1,3 +1,0 @@
-[submodule "tests/helper"]
-	path = tests/helper
-	url = https://github.com/TinyWebEx/TestHelper
