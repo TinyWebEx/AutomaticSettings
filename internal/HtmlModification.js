@@ -6,7 +6,7 @@
  */
 
 // common modules
-import * as Logger from "../../Logger/Logger.js";
+
 
 import * as OptionsModel from "./OptionsModel.js";
 
@@ -55,7 +55,7 @@ export function applyOptionToElement(option, optionGroup, elOption, optionValues
             optionValue = OptionsModel.getDefaultOption(optionGroup)[option];
         }
 
-        Logger.logInfo("got default value for applying option", option, ":", optionValue);
+        console.info("got default value for applying option", option, ":", optionValue);
 
         // if still no default value, try to use HTML defaults, i.e. do not set option
         if (optionValue === undefined) {

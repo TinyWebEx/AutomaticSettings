@@ -10,7 +10,7 @@
  */
 
 // common modules
-import * as Logger from "../../Logger/Logger.js";
+
 import * as CommonMessages from "../../MessageHandler/CommonMessages.js";
 
 // import internal modules
@@ -43,20 +43,20 @@ async function saveOption(event) {
 
     // do not save if managed
     if (elOption.hasAttribute("disabled")) {
-        Logger.logInfo(elOption, "is disabled, ignore sync setting");
+        console.info(elOption, "is disabled, ignore sync setting");
         return;
     }
 
     const [option, optionValue] = HtmlMod.getIdAndOptionsFromElement(elOption);
 
-    Logger.logInfo("save option", elOption, option, optionValue);
+    console.info("save option", elOption, option, optionValue);
 
     await Trigger.runSaveTrigger(option, optionValue);
 
     browser.storage.sync.set({
         [option]: optionValue
     }).catch((error) => {
-        Logger.logError("could not save option", option, ": ", error);
+        console.error("could not save option", option, ": ", error);
         CommonMessages.showError("couldNotSaveOption", true);
     });
 }
@@ -121,7 +121,7 @@ function setManagedOption(option, optionGroup, elOption = getElementFromOptionId
     return gettingOption.then((res) => {
         showManagedInfo();
 
-        Logger.logInfo("managed config found", res, elOption);
+        console.info("managed config found", res, elOption);
 
         HtmlMod.applyOptionToElement(option, optionGroup, elOption, res);
         // and disable control
@@ -160,7 +160,7 @@ function setSyncedOption(option, optionGroup, elOption = getElementFromOptionId(
     }
 
     return gettingOption.then((res) => {
-        Logger.logInfo("sync config found", res, elOption);
+        console.info("sync config found", res, elOption);
 
         HtmlMod.applyOptionToElement(option, optionGroup, elOption, res);
     });
@@ -192,7 +192,7 @@ export function loadOption(elOption, option) {
 
     return setManagedOption(option, optionGroup, elOption).catch((error) => {
         /* only log warning as that is expected when no manifest file is found */
-        Logger.logWarning("could not get managed options", error);
+        console.warn("could not get managed options", error);
 
         // now set "real"/"usual" option
         return setSyncedOption(option, optionGroup, elOption);
@@ -249,7 +249,7 @@ async function loadAllOptions() {
  * @returns {void}
  */
 async function resetOptions(event) {
-    Logger.logInfo("reset options");
+    console.info("reset options");
 
     // disable reset button (which triggered this) until process is finished
     event.target.setAttribute("disabled", "");
@@ -262,7 +262,7 @@ async function resetOptions(event) {
     // cleanup resetted cached option after message is hidden
     CommonMessages.setSuccessHook(null, () => {
         lastOptionsBeforeReset = null;
-        Logger.logInfo("reset options message hidden, undo vars cleaned");
+        console.info("reset options message hidden, undo vars cleaned");
     });
 
     // finally reset options
@@ -274,7 +274,7 @@ async function resetOptions(event) {
                     // re-load the options again
                     return loadAllOptions();
                 }).catch((error) => {
-                    Logger.logError("Could not undo option resetting: ", error);
+                    console.error("Could not undo option resetting: ", error);
                     CommonMessages.showError("couldNotUndoAction");
                 }).finally(() => {
                     CommonMessages.hideSuccess();
@@ -282,7 +282,7 @@ async function resetOptions(event) {
             }
         })
     )).catch((error) => {
-        Logger.logError(error);
+        console.error(error);
         CommonMessages.showError("resettingOptionsFailed", true);
     }).finally(() => {
         // re-enable button
@@ -302,7 +302,7 @@ export function init() {
     OptionsModel.verifyItIsReady();
 
     const loadPromise = loadAllOptions().catch((error) => {
-        Logger.logError(error);
+        console.error(error);
         CommonMessages.showError("couldNotLoadOptions", false);
 
         // re-throw error

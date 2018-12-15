@@ -5,7 +5,7 @@
  */
 
 // common modules
-import * as Logger from "../../Logger/Logger.js";
+
 
 import * as HtmlMod from "./HtmlModification.js";
 import * as OptionsModel from "./OptionsModel.js";
@@ -52,7 +52,7 @@ const triggers = {
  */
 export async function runSaveTrigger(option, optionValue) {
     if (option === undefined) {
-        Logger.logInfo("run all save triggers");
+        console.info("run all save triggers");
 
         const promises = [];
         for (const trigger of triggers.onSave) {
@@ -69,7 +69,7 @@ export async function runSaveTrigger(option, optionValue) {
         optionValue = await OptionsModel.getOption(option);
     }
 
-    Logger.logInfo("runSaveTrigger:", option, optionValue);
+    console.info("runSaveTrigger:", option, optionValue);
 
     // run all registered triggers for that option
     const promises = [];
@@ -175,7 +175,7 @@ export function runHtmlEventTrigger(event) {
  * @see {@link beforeLoadTrigger}
  */
 export function runBeforeLoadTrigger() {
-    Logger.logInfo("runBeforeLoadTrigger");
+    console.info("runBeforeLoadTrigger");
 
     // run all registered triggers for that option
     const promises = [];
@@ -194,7 +194,7 @@ export function runBeforeLoadTrigger() {
  * @see {@link afterLoadTrigger}
  */
 export function runAfterLoadTrigger() {
-    Logger.logInfo("runAfterLoadTrigger");
+    console.info("runAfterLoadTrigger");
 
     // run all registered triggers for that option
     const promises = [];
