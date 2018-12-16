@@ -5,13 +5,29 @@
  */
 
 // common modules
-
-
 import * as HtmlMod from "./HtmlModification.js";
 import * as OptionsModel from "./OptionsModel.js";
 
 /**
+ * Denotes a result if no triggers have been executed.
+ *
+ * @package
+ * @var {Symbol} NO_TRIGGERS_EXECUTED
+ */
+export const NO_TRIGGERS_EXECUTED = Symbol("noTriggersExecuted");
+
+/**
+ * Denotes a result if the override says saving/loading should be continued.
+ *
+ * @package
+ * @var {Symbol} CONTINUE_RESULT
+ */
+export const CONTINUE_RESULT = Symbol("continueWithResult");
+
+/**
  * Denotes to run all the currently registered save trigger.
+ *
+ * These do not include the triggers that override the save functions.
  *
  * @public
  * @var {Symbol} RUN_ALL_SAFE_TRIGGER
@@ -20,6 +36,8 @@ const RUN_ALL_SAVE_TRIGGER = Symbol("runAllSafeTrigger");
 
 const triggers = {
     onSave: [],
+    overrideSave: [],
+    overrideLoad: [],
     onChange: [],
     onUpdate: [],
     onBeforeLoad: [],
@@ -31,9 +49,54 @@ const triggers = {
  *
  * @async
  * @callback saveTrigger
- * @param {any} optionValue the value of the changed option
+ * @param {Object} optionValue the value of the changed option
  * @param {string} option the name of the option that has been changed
  * @return {Promise} optionally, to use await
+ */
+
+/**
+ * Trigger to run when saving is overwritten.
+ *
+ * You can call {@link overrideContinue()} at the end and return it's
+ * return value (in a Promise), if you want to continue saving some data.
+ * Otherwise you need to save all the data by yourself.
+ *
+ * @async
+ * @callback overrideSave
+ * @param {Object} param
+ * @param {Object} param.optionValue the value of the changed option
+ * @param {string} param.option the name of the option that has been changed
+ * @param {Array} param.saveTriggerValues all values returned by potentially
+ *                                          previously run safe triggers
+ * @returns {Promise} recommend
+ * @throws {Error} if saving e.g. fails, this will automatically trigger a generic
+ *                  error to be shown in the UI
+ */
+
+/**
+ * Trigger to run when loading is overwritten.
+ *
+ * You can call {@link overrideContinue()} at the end and return it's
+ * return value (in a Promise), if you want to continue loading some data.
+ * Otherwise you need to load all the data by yourself and apply it to the
+ * HTML file.
+ * Note: You should avoid using this together with option groups. Manually
+ * handling them can be complex, because e.g. this function may be called
+ * multiple times.
+ *
+ * @async
+ * @callback overrideLoad
+ * @param {Object} param
+ * @param {Object} param.optionValue the value of the option to be loaded
+ * @param {string} param.option the name of the option that has been changed
+ * @param {HTMLElement} param.elOption where the data is supposed to be loaded
+ *                     into
+ * @param {Object} param.optionValues result of a storage.[…].get call, which
+ *                  contains the values that should be applied to the file
+ *                  Please prefer "optionValue" instead of this, as this may not
+ *                  always contain a value here.
+ * @returns {Promise} recommend
+ * @throws {Error}
  */
 
 /**
@@ -77,6 +140,106 @@ export async function runSaveTrigger(option, optionValue) {
         promises.push(trigger.triggerFunc(optionValue, option));
     }
     return Promise.all(promises);
+}
+
+/**
+* Executes special handling for applying certain settings.
+*
+* E.g. when a setting is saved, it executes to apply some options live, so the
+* user immediately sees the change or the change is immediately applied.
+* If no parameters are passed, this gets and applies all options.
+*
+* @protected
+* @function
+* @param  {string} option
+* @param  {Object} optionValue
+* @param  {Array} saveTriggerValues value returned by potentially run safe triggers
+* @returns {Promise}
+* @see {@link overrideSave}
+*/
+export async function runOverrideSave(option, optionValue, saveTriggerValues) {
+    // run all registered triggers for that option
+    const allRegisteredOverrides = triggers.overrideSave.filter((trigger) => trigger.option === option);
+    if (allRegisteredOverrides.length === 0) {
+        return Promise.resolve(NO_TRIGGERS_EXECUTED);
+    }
+
+    console.info("runOverrideSave:", `${allRegisteredOverrides.length}x`, option, optionValue);
+
+    let lastPromise = Promise.resolve({
+        option,
+        optionValue,
+        saveTriggerValues
+    });
+
+    for (const trigger of allRegisteredOverrides) {
+        lastPromise = await lastPromise.then(trigger.triggerFunc);
+    }
+    return lastPromise;
+}
+
+/**
+ * Call this and return the return value if you want to continue saving or
+ * loading some data in the {@link overrideSave} or {@link overrideLoad}
+ * trigger at the end.
+ *
+ * If you return any other value, it is expected that you saved all the data
+ * on your own.
+ *
+ * @public
+ * @function
+ * @param  {Object} [optionValue] if omitted, the original option value will be used
+ * @param  {string} [option] if omitted, the current option name wil be used
+ * @param  {HTMLElement} [elOption] overwrite HTML element to modify, only
+ *                                  possible when this is called from a load
+ *                                  overwrite trigger.
+ * @returns {Object}
+ */
+function overrideContinue(optionValue, option, elOption) {
+    return {
+        command: CONTINUE_RESULT,
+        data: {
+            option,
+            optionValue,
+            elOption
+        }
+    };
+}
+
+/**
+* Executes special handling for loading/applying certain settings.
+*
+* @protected
+* @function
+* @param  {string} option
+* @param  {Object} optionValue
+* @param {HTMLElement} elOption where the data is supposed to be loaded
+*                     into
+* @param {Object} optionValues result of a storage.[…].get call, which
+*                  contains the values that should be applied to the file
+* @returns {Promise}
+* @see {@link overrideSave}
+*/
+export async function runOverrideLoad(option, optionValue, elOption, optionValues) {
+    // run all registered triggers for that option
+    const allRegisteredOverrides = triggers.overrideLoad.filter((trigger) => trigger.option === option);
+    if (allRegisteredOverrides.length === 0) {
+        return Promise.resolve(NO_TRIGGERS_EXECUTED);
+    }
+
+    console.info("runOverrideLoad:", `${allRegisteredOverrides.length}x`, option, optionValue);
+
+    let lastPromise = Promise.resolve({
+        option,
+        optionValue,
+        elOption,
+        optionValues
+    });
+
+    for (const trigger of allRegisteredOverrides) {
+        lastPromise = await lastPromise.then(trigger.triggerFunc);
+    }
+    return lastPromise;
 }
 
 /**
@@ -223,6 +386,7 @@ function registerTrigger(triggerType, optionTrigger, callback) {
 
 /**
  * Registers a save trigger.
+ *
  * The trigger get the values (optionValue, option) passed as parameters.
  * See {@link saveTrigger} for details.
  *
@@ -267,6 +431,40 @@ function registerUpdate(optionTrigger, callback) {
  */
 function registerChange(optionTrigger, callback) {
     registerTrigger("onChange", optionTrigger, callback);
+}
+
+/**
+ * Registers a save trigger for special handling when saving an option.
+ *
+ * The trigger get the values (optionValue, option) passed as parameters.
+ * See {@link overrideSave} for details.
+ * Usually there should only be one of these triggers.
+ *
+ * @public
+ * @function
+ * @param  {string} optionTrigger
+ * @param  {overrideSave} callback
+ * @returns {void}
+ */
+function addCustomSaveOverride(optionTrigger, callback) {
+    registerTrigger("overrideSave", optionTrigger, callback);
+}
+
+/**
+ * Registers a load trigger for special handling when loading an option.
+ *
+ * The trigger get the values (optionValue, option, …) passed as parameters.
+ * See {@link overrideLoad} for details.
+ * Usually there should only be one of these triggers.
+ *
+ * @public
+ * @function
+ * @param  {string} optionTrigger
+ * @param  {overrideLoad} callback
+ * @returns {void}
+ */
+function addCustomLoadOverride(optionTrigger, callback) {
+    registerTrigger("overrideLoad", optionTrigger, callback);
 }
 
 /**
@@ -322,6 +520,8 @@ function registerAfterLoad(callback) {
  */
 function unregisterAll() {
     triggers.onSave = [];
+    triggers.overrideSave = [];
+    triggers.overrideLoad = [];
     triggers.onChange = [];
     triggers.onUpdate = [];
     triggers.onBeforeLoad = [];
@@ -329,4 +529,16 @@ function unregisterAll() {
 }
 
 // export @public functions to be used as a public API as defaults
-export default {RUN_ALL_SAVE_TRIGGER, registerTrigger, registerSave, registerUpdate, registerChange, registerBeforeLoad, registerAfterLoad, unregisterAll};
+export default {
+    RUN_ALL_SAVE_TRIGGER,
+    overrideContinue,
+    registerTrigger,
+    registerSave,
+    addCustomSaveOverride,
+    addCustomLoadOverride,
+    registerUpdate,
+    registerChange,
+    registerBeforeLoad,
+    registerAfterLoad,
+    unregisterAll
+};

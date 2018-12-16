@@ -6,30 +6,7 @@
  */
 
 // common modules
-
-
 import * as OptionsModel from "./OptionsModel.js";
-
-/**
- * Remembers options groups with each option to be able to aggreegate them, later.
- *
- * @private
- * @var {Object}
- */
-let rememberedOptions;
-
-/**
- * Resets all remembered options.
- *
- * It just cleans the whole {@link rememberedOptions}.
- *
- * @protected
- * @function
- * @returns {void}
- */
-export function resetRememberedOptions() {
-    rememberedOptions = {};
-}
 
 /**
  * Applies option to element.
@@ -40,42 +17,11 @@ export function resetRememberedOptions() {
  * @protected
  * @function
  * @param  {string} option string ob object ID
- * @param  {string|null} optionGroup optiom group, if it is used
+ * @param  {Object} optionValue the value to set
  * @param  {HTMLElement} elOption where to apply feature
- * @param  {Object|undefined} optionValues object values
  * @returns {void}
  */
-export function applyOptionToElement(option, optionGroup, elOption, optionValues) {
-    let optionValue;
-    // get default value if value is not passed
-    if (!optionValues.hasOwnProperty(option) && !optionValues.hasOwnProperty(optionGroup)) {
-        if (optionGroup === null) {
-            optionValue = OptionsModel.getDefaultOption(option);
-        } else {
-            optionValue = OptionsModel.getDefaultOption(optionGroup)[option];
-        }
-
-        console.info("got default value for applying option", option, ":", optionValue);
-
-        // if still no default value, try to use HTML defaults, i.e. do not set option
-        if (optionValue === undefined) {
-            return;
-        }
-    } else {
-        // as value is present, get value from settings array
-        if (optionGroup === null) {
-            optionValue = optionValues[option];
-        } else {
-            const allOptionsInGroup = optionValues[optionGroup];
-            optionValue = optionValues[optionGroup][option];
-
-            // save options if needed
-            if (!rememberedOptions.hasOwnProperty(optionGroup)) {
-                rememberedOptions[optionGroup] = allOptionsInGroup;
-            }
-        }
-    }
-
+export function applyOptionToElement(option, optionValue, elOption) {
     // custom handling for special option types
     switch (elOption.getAttribute("type") || elOption.getAttribute("data-type")) {
     case "checkbox":
@@ -204,18 +150,15 @@ export function getIdAndOptionsFromElement(elOption, useDatagroup = true) {
     if (useDatagroup && "optiongroup" in elOption.dataset) {
         const optionGroup = elOption.dataset.optiongroup;
 
-        // if options are cached/saved use them to prevent them from getting lost
-        if (optionGroup in rememberedOptions) {
-            optionValue = rememberedOptions[optionGroup];
-        } else {
-            // otherwise just init empty array
-            optionValue = {};
-        }
+        optionValue = OptionsModel.getOptionGroup(optionGroup);
 
+        // update data in group with new values from settings HTML page
         document.querySelectorAll(`[data-optiongroup=${optionGroup}]`).forEach((elCurrentOption) => {
             const [currentOption, currentOptionValue] = getIdAndOptionFromElement(elCurrentOption);
             optionValue[currentOption] = currentOptionValue;
         });
+
+        // TODO: save back into cache??
 
         // use group name as ID for saving
         option = optionGroup;

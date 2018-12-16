@@ -1,8 +1,6 @@
 /**
  * Provides the data for the settings.
  *
- * Currently just used to provide the **default** data.
- *
  * @module internal/OptionsModel
  */
 
@@ -20,6 +18,114 @@
  * @return {Object}
  */
 let defaultOptionGetter;
+
+/**
+ * Remembers options groups with each option to be able to aggreegate them, later.
+ *
+ * @private
+ * @var {Object}
+ */
+let rememberedOptions;
+
+/**
+ * Resets all remembered options.
+ *
+ * It just cleans the whole {@link rememberedOptions}.
+ *
+ * @protected
+ * @function
+ * @returns {void}
+ */
+export function resetRememberedOptions() {
+    rememberedOptions = {};
+}
+
+/**
+ * Returns the whole option group based on the cached data.
+ *
+ * @protected
+ * @param {string} optionGroupName
+ * @function
+ * @returns {void}
+ */
+export function getOptionGroup(optionGroupName) {
+    let optionValue;
+
+    // if options are cached/saved use them to prevent them from getting lost
+    if (optionGroupName in rememberedOptions) {
+        optionValue = rememberedOptions[optionGroupName];
+    } else {
+        // otherwise just init empty array
+        optionValue = {};
+    }
+
+    return optionValue;
+}
+
+/**
+ * Returns the sync option or falls back to the default option.
+ *
+ * @private
+ * @function
+ * @param  {string} option string ob object ID
+ * @param  {string|null} optionGroup optiom group, if it is used
+ * @param  {Object|undefined} optionValues pre-loaded object values
+ * @returns {Object|undefined}
+ */
+export function getOptionGroupOrOption(option, optionGroup, optionValues) {
+    let optionValue;
+
+    // as value is present, get value from settings array
+    if (optionGroup === null) {
+        optionValue = optionValues[option];
+    } else {
+        const allOptionsInGroup = optionValues[optionGroup];
+        optionValue = optionValues[optionGroup][option];
+
+        // save options if needed
+        if (optionGroup in rememberedOptions) {
+            rememberedOptions[optionGroup] = allOptionsInGroup;
+        }
+    }
+
+    return optionValue;
+}
+
+/**
+ * Returns the option value if you give it a pre-fetched object of options.
+ *
+ * It basically handles the complexity behind option groups and automatically
+ * fetches the default options, if needed.
+ *
+ * @protected
+ * @param  {string} option string ob object ID
+ * @param  {string|null} optionGroup optiom group, if it is used
+ * @param  {Object|undefined} optionValues pre-loaded object values
+ * @returns {Object|null}
+ */
+export function getOptionValueFromRequestResults(option, optionGroup, optionValues) {
+    let optionValue;
+
+    // get default value if value is not passed
+    if (!(option in optionValues) && !(optionGroup in optionValues)) {
+        if (optionGroup === null) {
+            optionValue = getDefaultOption(option);
+        } else {
+            optionValue = getDefaultOption(optionGroup)[option];
+        }
+
+        console.info("got default value for applying option", option, ":", optionValue);
+
+        // if still no default value, try to use HTML defaults, i.e. do not set option
+        if (optionValue === undefined) {
+            return null;
+        }
+    } else {
+        optionValue = getOptionGroupOrOption(option, optionGroup, optionValues);
+    }
+
+    return optionValue;
+}
 
 /**
  * Returns whether the default option provider is provided, so we can get some defaults.

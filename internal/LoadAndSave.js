@@ -47,18 +47,31 @@ async function saveOption(event) {
         return;
     }
 
-    const [option, optionValue] = HtmlMod.getIdAndOptionsFromElement(elOption);
+    let [option, optionValue] = HtmlMod.getIdAndOptionsFromElement(elOption);
 
     console.info("save option", elOption, option, optionValue);
 
-    await Trigger.runSaveTrigger(option, optionValue);
+    const saveTriggerValue = await Trigger.runSaveTrigger(option, optionValue);
 
-    browser.storage.sync.set({
-        [option]: optionValue
-    }).catch((error) => {
+    try {
+        const result = await Trigger.runOverrideSave(option, optionValue, saveTriggerValue);
+
+        // destructre data, if it has been returned
+        if (result.command === Trigger.CONTINUE_RESULT) {
+            ( {option = option, optionValue = optionValue} = result.data );
+        }
+
+        // continue saving if no triggers executed or they want to save something
+        if (result === Trigger.NO_TRIGGERS_EXECUTED ||
+            result.command === Trigger.CONTINUE_RESULT) {
+            browser.storage.sync.set({
+                [option]: optionValue
+            });
+        }
+    } catch (error) {
         console.error("could not save option", option, ": ", error);
         CommonMessages.showError("couldNotSaveOption", true);
-    });
+    }
 }
 
 /**
@@ -89,6 +102,37 @@ function showManagedInfo() {
  */
 function getElementFromOptionId(option) {
     return document.querySelector(`[name=${option}]`);
+}
+
+/**
+ * Applies an option to the HTML element. This is the final step, before it goes
+ * into the {@link HtmlMod} module.
+ *
+ * @private
+ * @function
+ * @param  {string} option string ob object ID
+ * @param  {string|null} optionGroup optiom group, if it is used
+ * @param  {HTMLElement} elOption where to apply feature
+ * @param  {Object|undefined} optionValues object values
+ * @returns {Promise}
+ */
+async function applyOption(option, optionGroup, elOption, optionValues) {
+    let optionValue = OptionsModel.getOptionValueFromRequestResults(option, optionGroup, optionValues);
+
+    const overwriteResult = await Trigger.runOverrideLoad(option, optionValue, elOption, optionValues);
+
+    // loading manually handled if no triggers executed or they want to save something
+    if (overwriteResult !== Trigger.NO_TRIGGERS_EXECUTED &&
+        overwriteResult.command !== Trigger.CONTINUE_RESULT) {
+        return Promise.resolve();
+    }
+
+    // destructre data, if it has been returned
+    if (overwriteResult.command === Trigger.CONTINUE_RESULT) {
+        ( {option = option, optionValue = optionValue, elOption = elOption} = overwriteResult.data );
+    }
+
+    return HtmlMod.applyOptionToElement(option, optionValue, elOption);
 }
 
 /**
@@ -123,11 +167,12 @@ function setManagedOption(option, optionGroup, elOption = getElementFromOptionId
 
         console.info("managed config found", res, elOption);
 
-        HtmlMod.applyOptionToElement(option, optionGroup, elOption, res);
         // and disable control
         elOption.setAttribute("disabled", "");
         elOption.setAttribute("title", browser.i18n.getMessage("optionIsDisabledBecauseManaged"));
         // could also set readonly elOption.setAttribute("readonly", "") //TODO: test
+
+        return applyOption(option, optionGroup, elOption, res);
     });
 }
 
@@ -162,7 +207,7 @@ function setSyncedOption(option, optionGroup, elOption = getElementFromOptionId(
     return gettingOption.then((res) => {
         console.info("sync config found", res, elOption);
 
-        HtmlMod.applyOptionToElement(option, optionGroup, elOption, res);
+        return applyOption(option, optionGroup, elOption, res);
     });
 }
 
@@ -221,7 +266,7 @@ export function loadOptionByName(option, elOption = getElementFromOptionId(optio
  */
 async function loadAllOptions() {
     // reset remembered options to prevent arkward errors when reloading the options
-    HtmlMod.resetRememberedOptions();
+    OptionsModel.resetRememberedOptions();
     const allPromises = [];
 
     await Trigger.runBeforeLoadTrigger();
