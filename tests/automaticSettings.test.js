@@ -1069,7 +1069,7 @@ describe("options module: AutomaticSettings", function () {
         async function setExampleOptionGroup() {
             await setupOptionToTest(`<li>
             <fieldset id="sizeType" data-type="radiogroup" data-optiongroup="goodOptions" class="setting save-on-input">
-                <legend >set mode</legend>
+                <legend>set mode</legend>
                 <ul>
                     <li>
                         <input id="sizeOne" type="radio" name="sizeType" value="oneValue">
@@ -1090,10 +1090,10 @@ describe("options module: AutomaticSettings", function () {
                     </li>
                 </ul>
             </fieldset>
-            </li>
-            <li>
-                <input class="setting save-on-input" data-optiongroup="goodOptions" type="text" name="anotherSetting" id="anotherOption">
-            </li>`, "goodOptions", "", {
+        </li>
+        <li>
+            <input class="setting save-on-input" data-optiongroup="goodOptions" type="text" name="anotherSetting" id="anotherOption">
+        </li>`, "goodOptions", "", {
                 sizeType: "oneValue",
                 partialSetting: 8421,
                 anotherSetting: "withSomeText"

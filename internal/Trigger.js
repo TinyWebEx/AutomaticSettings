@@ -67,7 +67,7 @@ const triggers = {
  * @param {Object} param.optionValue the value of the changed option
  * @param {string} param.option the name of the option that has been changed
  * @param {Array} param.saveTriggerValues all values returned by potentially
- *                                          previously run safe triggers
+ *                                          previously run save triggers
  * @returns {Promise} recommend
  * @throws {Error} if saving e.g. fails, this will automatically trigger a generic
  *                  error to be shown in the UI
