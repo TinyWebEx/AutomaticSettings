@@ -41,8 +41,6 @@ This e.g. changes a numeric value setting as `greatSettingsNum`:
 <input class="setting save-on-change" id="testSetting" name="greatSettingsNum" type="number">
 ```
 
-(This [example is taken from the unit tests](tests/automaticSettings.tests.js#225), BTW.)
-
 ### Select element
 
 To select a single value and save it as `select`:
@@ -55,9 +53,6 @@ To select a single value and save it as `select`:
     <option value="H">High (30%)</option>
 </select>
 ```
-
-(This [example is taken from the unit tests](tests/automaticSettings.tests.js#935), BTW.)
-
 
 ### Radio options
 
@@ -90,8 +85,6 @@ You have to:
 * if you use a `fieldset` you can bind the save trigger to this fieldset as shown above, or to each individual `input type="radio"`. It's just easy to forget one element if you specify it individually, that's why the behaviour shown above is recommended.
 * Note, however, that it is always required to add the `setting` class to the container (i.e. `fieldset`), to enable the loading of this setting. Note that this is _not_ required for the indidual options.
   It can be useful, however, to prevent multiple triggers, if you e.g. have other options inside of the fieldset. These are e.g. also automatically triggered when a chield input is triggered, so this can lead to it being saved multiple times. This usually is not a (noteworthy) problem, but you can see it in the console log messages.
-
-(This [example is taken from the unit tests](tests/automaticSettings.tests.js#959), BTW.)
 
 ## Option groups
 
