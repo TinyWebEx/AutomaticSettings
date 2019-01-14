@@ -23,7 +23,7 @@ It mostly just works with some additions to your HTML code. The HTML code itself
 
 ## Examples
 
-Obviously the examples below are minimal examples. Please anyway use proper HTML markup with `label` and such things. This has just nothing to do with this add-on. :)
+Obviously the examples below are minimal examples. Please anyway use proper HTML markup with `label` and so on. You can add almost any elements anywhere. This has just nothing to do with this add-on. 🙂
 
 ### Checkbox
 
