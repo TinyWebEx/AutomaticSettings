@@ -136,7 +136,7 @@ For instance, the following HTML would result in the object shown above:
 </li>
 ```
 
-## Loading the add-on
+## Loading the settings
 
 To enable this plugin, you still a few lines of JavaScript - respectively one line:
 ```js
@@ -153,7 +153,7 @@ You can additionally intercept loading and saving some settings or check the val
 In most cases, you always pass the registration functions the name of the option to be saved as a string and the function that you want to register as a callback. Most triggers are valid for a single option, whose name you specify, in order to prevent that 
 You can register as many triggers, as you want.
 
-Generally, it is recommend to register all triggers _before_ calling the [`init` method](#javascript-integration) of this module, but it also works to register triggers at any time.
+Generally, it is recommend to register all triggers _before_ calling the [`init` method](#loading-the-settings) of this module, but it also works to register triggers at any time.
 
 ### Update & Change trigger
 
