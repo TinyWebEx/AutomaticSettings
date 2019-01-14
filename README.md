@@ -1,6 +1,6 @@
 # TinyWebEx AutomaticSettings
 
-A simple module that allows you to specify your add-on settings in HTML-only, so you can focus on adding settings and not care about how to load and save them. This means you do not have to write any custom JavaScript!
+A simple module that allows you to specify your add-on settings in HTML-only, so you can focus on adding settings and not care about how to load and save them. This means you do not have to write any custom JavaScript!  
 It is also designed to be used with settings pages that save their settings automatically. There is no need for an "OK" button or similar confirmation after the user entered the data.
 
 ## Features
@@ -182,7 +182,7 @@ If [option groups](#option-groups) are not enough for you, you can use `Automati
 
 As always in these triggers, you get some information about the option that is loaded/saved and can check that. However, in addition you can get the data returned by your [save trigger](#save-trigger) in `saveTriggerValues`, so you can re-use it.
 
-In contrast to the [save triggers](#save-trigger) you can also actually influence/overwrite whether/how the value is loaded/saved. By default, the library assumes you now handle loading and saving by yourself, i.e. you need to interact with the HTML DOM (for loading) or the storage API (for saving) directly. By all means, you are overwriting the loading/saving process...
+In contrast to the [save triggers](#save-trigger) you can also actually influence/overwrite whether/how the value is loaded/saved. By default, the library assumes you now handle loading and saving by yourself, i.e. you need to interact with the HTML DOM (for loading) or the storage API (for saving) directly. By all means, you are overwriting the loading/saving process...  
 However, you can also return a special value that is returned by `AutomaticSettings.Trigger.overrideContinue` to indicate you want to continue saving/loading, but use different data for it, i.e. you just modify the data to load/save. You just pass it the value you want to continue the process.
 
 In the end, it can e.g. look like this:
