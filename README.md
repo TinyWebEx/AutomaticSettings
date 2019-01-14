@@ -155,7 +155,7 @@ You can register as many triggers, as you want.
 
 Generally, it is recommend to register all triggers _before_ calling the [`init` method](#javascript-integration) of this module, but it also works to register triggers at any time.
 
-#### Update & Change trigger
+### Update & Change trigger
 
 You can use `AutomaticSettings.Trigger.registerUpdate` or `AutomaticSettings.Trigger.registerChange` to register a custom callback that is executed when the user updates (triggered by [input](https://developer.mozilla.org/docs/Web/Events/input)) or [changes](https://developer.mozilla.org/docs/Web/Events/change) an input option.
 
@@ -167,14 +167,14 @@ Note however, that this way is seperate from the whole loading & saving of the d
 
 Note that you need to add the additional classes `trigger-on-update` (for the update trigger/`registerUpdate`) or `trigger-on-change` (for the input trigger/`registerChange`) to the respective options, to make this feature work. Without it, the library does not bind to these elements.
 
-#### Save trigger
+### Save trigger
 
 You can use `AutomaticSettings.Trigger.registerSave` to register a "save trigger" that is executed when an option is saved (actually directly before it is saved).
 It is thus quite useful to automatically apply the option or send it to other parts of the browser extension, so they are notified that a the value of the option changed. This is a useful feature for your usability, because the `AutomaticSetings` module automatically saves all options, so they should also automatically be applied, so the user immediately sees the difference.
 
 You can also use it to validate the input and cancel saving, you need to throw some errors then. Note that you should then show an appropiate error message yourself, as this error is not catched by the library - in contrast to everything else that happens afterwards, i.e. the saving of the option itself, e.g.
 
-#### Triggers before and after loading
+### Triggers before and after loading
 
 When the triggers are used as expected, you usually get to one problem: Directly after your options have been loaded, you may see an inconsistent state, as your [save triggers](#save-trigger) did not yet run and no checks on the previously loaded data is done, etc.
 
@@ -182,7 +182,7 @@ To solve this, there is `AutomaticSettings.Trigger.registerAfterLoad`, which can
 
 Similarly there is `AutomaticSettings.Trigger.registerBeforeLoad` to let you execute stuff before any option is loaded.
 
-#### Overwriting loading and saving behaviour
+### Overwriting loading and saving behaviour
 
 Sometimes it is needed to present data to the user in one way, but save it in another way. Thus, you need to manipulate how data is loaded or saved.
 If [option groups](#option-groups) are not enough for you, you can use `AutomaticSettings.Trigger.addCustomLoadOverride` and `AutomaticSettings.Trigger.addCustomSaveOverride` to override the respective features.
