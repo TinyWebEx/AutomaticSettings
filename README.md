@@ -9,6 +9,7 @@ It is also designed to be used with settings pages that save their settings auto
 * can automatically save all options in a useful data format (number values are also saved as numbers, not strings)
 * [saving multiple options grouped together in JS objects](#option-groups)
 * [MessageHandler integration](https://github.com/TinyWebEx/MessageHandler), e.g. to show errors when saving or loading an option fails, or to show a message if some managed options are used.
+* [can automatically let your reset button spring to live](#reset-button)
 
 ## Usage
 
@@ -156,7 +157,7 @@ In both cases, you get the `optionValue` of the setting, the option name and the
 
 This is mostly useful if some options depend on each other (that happens often when using [option groups](#option-groups) e.g.), so you can interactively disable elements based on the user selection/input; or, if you want top verify the data the user entered and show some warnings or so.
 
-Note however, that this way is seperate from the whole loading & saving of the data, so you cannot prevent an invalid value from being saved or so, here. Do [overwrite the loading or saving behaviour](#overwriting-loading-and-saving-behaviour) if you want to do this.
+Note however, that this way is separate from the whole loading & saving of the data, so you cannot prevent an invalid value from being saved or so, here. Do [overwrite the loading or saving behaviour](#overwriting-loading-and-saving-behaviour) if you want to do this.
 
 Note that you need to add the additional classes `trigger-on-update` (for the update trigger/`registerUpdate`) or `trigger-on-change` (for the input trigger/`registerChange`) to the respective options, to make this feature work. Without it, the library does not bind to these elements.
 
@@ -165,7 +166,7 @@ Note that you need to add the additional classes `trigger-on-update` (for the up
 You can use `AutomaticSettings.Trigger.registerSave` to register a "save trigger" that is executed when an option is saved (actually directly before it is saved).
 It is thus quite useful to automatically apply the option or send it to other parts of the browser extension, so they are notified that a the value of the option changed. This is a useful feature for your usability, because the `AutomaticSetings` module automatically saves all options, so they should also automatically be applied, so the user immediately sees the difference.
 
-You can also use it to validate the input and cancel saving, you need to throw some errors then. Note that you should then show an appropiate error message yourself, as this error is not catched by the library - in contrast to everything else that happens afterwards, i.e. the saving of the option itself, e.g.
+You can also use it to validate the input and cancel saving, you need to throw some errors then. Note that you should then show an appropriate error message yourself, as this error is not catched by the library - in contrast to everything else that happens afterwards, i.e. the saving of the option itself, e.g.
 
 ### Triggers before and after loading
 
@@ -175,7 +176,7 @@ To solve this, there is `AutomaticSettings.Trigger.registerAfterLoad`, which can
 
 Similarly there is `AutomaticSettings.Trigger.registerBeforeLoad` to let you execute stuff before any option is loaded.
 
-### Overwriting loading and saving behaviour
+### Overwriting loading and saving behavior
 
 Sometimes it is needed to present data to the user in one way, but save it in another way. Thus, you need to manipulate how data is loaded or saved.
 If [option groups](#option-groups) are not enough for you, you can use `AutomaticSettings.Trigger.addCustomLoadOverride` and `AutomaticSettings.Trigger.addCustomSaveOverride` to override the respective features.
@@ -206,6 +207,10 @@ function saveOptionXy(param) {
     return AutomaticSettings.Trigger.overrideContinue(newOption);
 }
 ```
+
+## Reset buttons
+
+Doc is TODO…
 
 ## API note
 
