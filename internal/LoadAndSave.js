@@ -3,19 +3,22 @@
  *
  * @public
  * @module AutomaticSettings
+ * @requires lodash/debounce
  * @requires ../data/MessageLevel
  * @requires AutomaticSettings/Trigger
  * @requires AutomaticSettings/HtmlModification
  */
 
 // common modules
-
+import debounce from "/common/modules/lodash/debounce.js";
 import * as CommonMessages from "../../MessageHandler/CommonMessages.js";
 
 // import internal modules
 import * as Trigger from "./Trigger.js";
 import * as HtmlMod from "./HtmlModification.js";
 import * as OptionsModel from "./OptionsModel.js";
+
+const DEFAULT_DEBOUNCE_TIME = 250; // 250 ms
 
 // vars
 let managedInfoIsShown = false;
@@ -340,9 +343,13 @@ async function resetOptions(event) {
  *
  * @public
  * @function
+ * @param {Object} [options]
+ * @param {number} [options.debounceTime] {@link https://lodash.com/docs#debounce}
  * @returns {Promise}
  */
-export function init() {
+export function init(options = {
+    debounceTime: DEFAULT_DEBOUNCE_TIME
+}) {
     // check requirements
     OptionsModel.verifyItIsReady();
 
@@ -360,6 +367,15 @@ export function init() {
     });
     document.querySelectorAll(".save-on-change").forEach((currentElem) => {
         currentElem.addEventListener("change", saveOption);
+    });
+
+    // debounced versions
+    const saveOptionDebounced = debounce(saveOption, options.debounceTime);
+    document.querySelectorAll(".save-on-input-debounce").forEach((currentElem) => {
+        currentElem.addEventListener("input", saveOptionDebounced);
+    });
+    document.querySelectorAll(".save-on-change-debounce").forEach((currentElem) => {
+        currentElem.addEventListener("change", saveOptionDebounced);
     });
 
     document.querySelectorAll(".trigger-on-update").forEach((currentElem) => {
