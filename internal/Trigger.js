@@ -52,6 +52,7 @@ const triggers = {
  * @callback saveTrigger
  * @param {Object} optionValue the value of the changed option
  * @param {string} option the name of the option that has been changed
+ * @param {Event} event the event (input or change) that triggered saving
  * @return {Promise} optionally, to use await
  */
 
@@ -69,6 +70,7 @@ const triggers = {
  * @param {string} param.option the name of the option that has been changed
  * @param {Array} param.saveTriggerValues all values returned by potentially
  *                                          previously run save triggers
+ * @param {Event} param.event the event (input or change) that triggered saving
  * @returns {Promise} recommend
  * @throws {Error} if saving e.g. fails, this will automatically trigger a generic
  *                  error to be shown in the UI
@@ -111,10 +113,11 @@ const triggers = {
  * @function
  * @param  {string} [option]
  * @param  {Object} [optionValue] will be automatically retrieved, if not given
+ * @param {Event} event the event (input or change) that triggered saving
  * @returns {Promise}
  * @see {@link saveTrigger}
  */
-export async function runSaveTrigger(option, optionValue) {
+export async function runSaveTrigger(option, optionValue, event) {
     if (option === undefined) {
         console.info("run all save triggers");
 
@@ -133,32 +136,33 @@ export async function runSaveTrigger(option, optionValue) {
         optionValue = await OptionsModel.getOption(option);
     }
 
-    console.info("runSaveTrigger:", option, optionValue);
+    console.info("runSaveTrigger:", option, optionValue, event);
 
     // run all registered triggers for that option
     const promises = [];
     for (const trigger of triggers.onSave.filter((trigger) => trigger.option === option)) {
-        promises.push(trigger.triggerFunc(optionValue, option));
+        promises.push(trigger.triggerFunc(optionValue, option, event));
     }
     return Promise.all(promises);
 }
 
 /**
-* Executes special handling for applying certain settings.
-*
-* E.g. when a setting is saved, it executes to apply some options live, so the
-* user immediately sees the change or the change is immediately applied.
-* If no parameters are passed, this gets and applies all options.
-*
-* @protected
-* @function
-* @param  {string} option
-* @param  {Object} optionValue
-* @param  {Array} saveTriggerValues value returned by potentially run safe triggers
-* @returns {Promise}
-* @see {@link overrideSave}
-*/
-export async function runOverrideSave(option, optionValue, saveTriggerValues) {
+ * Executes special handling for applying certain settings.
+ *
+ * E.g. when a setting is saved, it executes to apply some options live, so the
+ * user immediately sees the change or the change is immediately applied.
+ * If no parameters are passed, this gets and applies all options.
+ *
+ * @protected
+ * @function
+ * @param  {string} option
+ * @param  {Object} optionValue
+ * @param  {Array} saveTriggerValues value returned by potentially run safe triggers
+ * @param {Event} event the event (input or change) that triggered saving
+ * @returns {Promise}
+ * @see {@link overrideSave}
+ */
+export async function runOverrideSave(option, optionValue, saveTriggerValues, event) {
     // run all registered triggers for that option
     const allRegisteredOverrides = triggers.overrideSave.filter((trigger) => trigger.option === option);
     if (allRegisteredOverrides.length === 0) {
@@ -170,7 +174,8 @@ export async function runOverrideSave(option, optionValue, saveTriggerValues) {
     let lastPromise = Promise.resolve({
         option,
         optionValue,
-        saveTriggerValues
+        saveTriggerValues,
+        event
     });
 
     for (const trigger of allRegisteredOverrides) {
@@ -279,7 +284,7 @@ export async function runOverrideLoad(option, optionValue, elOption, optionValue
  * @function
  * @param  {Event} event
  * @returns {void}
- * @throws {Error}
+ * @throws {TypeError}
  */
 export function runHtmlEventTrigger(event) {
     const elOption = event.target;
@@ -296,7 +301,7 @@ export function runHtmlEventTrigger(event) {
         triggerType = "onChange";
         break;
     default:
-        throw new Error("invalid event type attached");
+        throw new TypeError("invalid event type attached");
     }
 
     // run all registered triggers for that option

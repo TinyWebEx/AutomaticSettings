@@ -48,12 +48,12 @@ async function saveOption(event) {
 
     let [option, optionValue] = HtmlMod.getIdAndOptionsFromElement(elOption);
 
-    console.info("save option", elOption, option, optionValue);
+    const saveTriggerValue = await Trigger.runSaveTrigger(option, optionValue, event);
 
-    const saveTriggerValue = await Trigger.runSaveTrigger(option, optionValue);
+    console.info("save option", elOption, option, optionValue, event, saveTriggerValue);
 
     try {
-        const result = await Trigger.runOverrideSave(option, optionValue, saveTriggerValue);
+        const result = await Trigger.runOverrideSave(option, optionValue, saveTriggerValue, event);
 
         // destructre data, if it has been returned
         if (result.command === Trigger.CONTINUE_RESULT) {
