@@ -113,11 +113,14 @@ const triggers = {
  * @function
  * @param  {string} [option]
  * @param  {Object} [optionValue] will be automatically retrieved, if not given
- * @param {Event} event the event (input or change) that triggered saving
+ * @param {Event} [event] the event (input or change) that triggered saving
  * @returns {Promise}
  * @see {@link saveTrigger}
  */
-export async function runSaveTrigger(option, optionValue, event) {
+export async function runSaveTrigger(option, optionValue, event = {}) {
+    // default event parameter to empty object
+    event = event || {};
+
     if (option === undefined) {
         console.info("run all save triggers");
 
@@ -126,7 +129,7 @@ export async function runSaveTrigger(option, optionValue, event) {
             const option = trigger.option;
             const optionValue = await OptionsModel.getOption(option);
 
-            promises.push(trigger.triggerFunc(optionValue, option));
+            promises.push(trigger.triggerFunc(optionValue, option, event));
         }
         return Promise.all(promises);
     }
@@ -158,11 +161,11 @@ export async function runSaveTrigger(option, optionValue, event) {
  * @param  {string} option
  * @param  {Object} optionValue
  * @param  {Array} saveTriggerValues value returned by potentially run safe triggers
- * @param {Event} event the event (input or change) that triggered saving
+ * @param {Event} [event] the event (input or change) that triggered saving
  * @returns {Promise}
  * @see {@link overrideSave}
  */
-export async function runOverrideSave(option, optionValue, saveTriggerValues, event) {
+export async function runOverrideSave(option, optionValue, saveTriggerValues, event = {}) {
     // run all registered triggers for that option
     const allRegisteredOverrides = triggers.overrideSave.filter((trigger) => trigger.option === option);
     if (allRegisteredOverrides.length === 0) {
@@ -170,6 +173,9 @@ export async function runOverrideSave(option, optionValue, saveTriggerValues, ev
     }
 
     console.info("runOverrideSave:", `${allRegisteredOverrides.length}x`, option, optionValue);
+
+    // default event parameter to empty object
+    event = event || {};
 
     let lastPromise = Promise.resolve({
         option,
