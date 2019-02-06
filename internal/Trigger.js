@@ -51,6 +51,8 @@ const triggers = {
  * @callback saveTrigger
  * @param {Object} optionValue the value of the changed option
  * @param {string} option the name of the option that has been changed
+ * @param {Event} event the event (input or change) that triggered saving
+ *                      (may not always be defined, e.g. when loading)
  * @return {Promise} optionally, to use await
  */
 
@@ -110,10 +112,16 @@ const triggers = {
  * @function
  * @param  {string} [option]
  * @param  {Object} [optionValue] will be automatically retrieved, if not given
+ * @param {Event} [event] the event (input or change) that triggered saving
  * @returns {Promise}
  * @see {@link saveTrigger}
  */
-export async function runSaveTrigger(option, optionValue) {
+export async function runSaveTrigger(option, optionValue, event = {}) {
+    // create object in case event is empty
+    if (!event) {
+        event = {};
+    }
+
     if (option === undefined) {
         console.info("run all save triggers");
 
@@ -122,7 +130,7 @@ export async function runSaveTrigger(option, optionValue) {
             const option = trigger.option;
             const optionValue = await OptionsModel.getOption(option);
 
-            promises.push(trigger.triggerFunc(optionValue, option));
+            promises.push(trigger.triggerFunc(optionValue, option, event));
         }
         return Promise.all(promises);
     }
@@ -164,7 +172,7 @@ export async function runOverrideSave(option, optionValue, saveTriggerValues) {
         return Promise.resolve(NO_TRIGGERS_EXECUTED);
     }
 
-    console.info("runOverrideSave:", `${allRegisteredOverrides.length}x`, option, optionValue);
+    console.info("runOverrideSave:", `${allRegisteredOverrides.length}x`, option, optionValue, saveTriggerValues, event);
 
     let lastPromise = Promise.resolve({
         option,
