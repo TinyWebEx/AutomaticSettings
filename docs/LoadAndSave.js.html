@@ -1,24 +1,65 @@
-/**
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    
+    <meta charset="utf-8">
+    <title>LoadAndSave.js - Documentation</title>
+    
+    
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav >
+    
+    <h2><a href="index.html">Home</a></h2><h2><a href="https://github.com/TinyWebEx/" >All TinyWebExt modules</a></h2>
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">LoadAndSave.js</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
  * Load, save and apply options to HTML options page.
  *
- * @public
- * @module AutomaticSettings
- * @requires lodash/debounce
- * @requires ../data/MessageLevel
- * @requires AutomaticSettings/Trigger
- * @requires AutomaticSettings/HtmlModification
+ * @module internal/LoadAndSave
+ * @requires /common/modules/Logger
+ * @requires /common/modules/data/MessageLevel
+ * @requires /common/modules/MessageHandler
+ * @requires ./Trigger
+ * @requires ./HtmlModification
  */
 
 // common modules
-import debounce from "/common/modules/lodash/debounce.js";
+
 import * as CommonMessages from "../../MessageHandler/CommonMessages.js";
 
 // import internal modules
 import * as Trigger from "./Trigger.js";
 import * as HtmlMod from "./HtmlModification.js";
 import * as OptionsModel from "./OptionsModel.js";
-
-const DEFAULT_DEBOUNCE_TIME = 250; // 250 ms
 
 // vars
 let managedInfoIsShown = false;
@@ -51,12 +92,12 @@ async function saveOption(event) {
 
     let [option, optionValue] = HtmlMod.getIdAndOptionsFromElement(elOption);
 
-    const saveTriggerValue = await Trigger.runSaveTrigger(option, optionValue, event);
+    console.info("save option", elOption, option, optionValue);
 
-    console.info("save option", elOption, option, optionValue, event, saveTriggerValue);
+    const saveTriggerValue = await Trigger.runSaveTrigger(option, optionValue);
 
     try {
-        const result = await Trigger.runOverrideSave(option, optionValue, saveTriggerValue, event);
+        const result = await Trigger.runOverrideSave(option, optionValue, saveTriggerValue);
 
         // destructre data, if it has been returned
         if (result.command === Trigger.CONTINUE_RESULT) {
@@ -124,7 +165,7 @@ async function applyOption(option, optionGroup, elOption, optionValues) {
     const overwriteResult = await Trigger.runOverrideLoad(option, optionValue, elOption, optionValues);
 
     // loading manually handled if no triggers executed or they want to save something
-    if (overwriteResult !== Trigger.NO_TRIGGERS_EXECUTED &&
+    if (overwriteResult !== Trigger.NO_TRIGGERS_EXECUTED &amp;&amp;
         overwriteResult.command !== Trigger.CONTINUE_RESULT) {
         return Promise.resolve();
     }
@@ -153,7 +194,7 @@ async function applyOption(option, optionGroup, elOption, optionValues) {
  * @returns {Promise}
  */
 function setManagedOption(option, optionGroup, elOption = getElementFromOptionId(option)) {
-    if (optionGroup === undefined && elOption.hasAttribute("data-optiongroup")) {
+    if (optionGroup === undefined &amp;&amp; elOption.hasAttribute("data-optiongroup")) {
         optionGroup = elOption.getAttribute("data-optiongroup");
     }
 
@@ -195,7 +236,7 @@ function setManagedOption(option, optionGroup, elOption = getElementFromOptionId
  * @returns {Promise}
  */
 function setSyncedOption(option, optionGroup, elOption = getElementFromOptionId(option)) {
-    if (optionGroup === undefined && elOption.hasAttribute("data-optiongroup")) {
+    if (optionGroup === undefined &amp;&amp; elOption.hasAttribute("data-optiongroup")) {
         optionGroup = elOption.getAttribute("data-optiongroup");
     }
 
@@ -218,7 +259,7 @@ function setSyncedOption(option, optionGroup, elOption = getElementFromOptionId(
  *
  * Optionally, you can already give it the option name.
  *
- * @package
+ * @public
  * @function
  * @param  {HTMLElement} elOption element of the option
  * @param  {string} [option] name of the option
@@ -233,7 +274,7 @@ export function loadOption(elOption, option) {
     }
 
     // try to get option ID from input element if needed
-    if (!option && elOption.dataset.type === "radiogroup") {
+    if (!option &amp;&amp; elOption.dataset.type === "radiogroup") {
         option = elOption.querySelector("input[type=radio]").getAttribute("name");
     }
 
@@ -245,11 +286,10 @@ export function loadOption(elOption, option) {
         return setSyncedOption(option, optionGroup, elOption);
     });
 }
-
 /**
  * Load option and set to element if you give it an option name.
  *
- * @package
+ * @public
  * @function
  * @param  {string} option name of the option
  * @param  {HTMLElement} [elOption] optional element of the option, will
@@ -343,13 +383,9 @@ async function resetOptions(event) {
  *
  * @public
  * @function
- * @param {Object} [options]
- * @param {number} [options.debounceTime] {@link https://lodash.com/docs#debounce}
  * @returns {Promise}
  */
-export function init(options = {
-    debounceTime: DEFAULT_DEBOUNCE_TIME
-}) {
+export function init() {
     // check requirements
     OptionsModel.verifyItIsReady();
 
@@ -369,15 +405,6 @@ export function init(options = {
         currentElem.addEventListener("change", saveOption);
     });
 
-    // debounced versions
-    const saveOptionDebounced = debounce(saveOption, options.debounceTime);
-    document.querySelectorAll(".save-on-input-debounce").forEach((currentElem) => {
-        currentElem.addEventListener("input", saveOptionDebounced);
-    });
-    document.querySelectorAll(".save-on-change-debounce").forEach((currentElem) => {
-        currentElem.addEventListener("change", saveOptionDebounced);
-    });
-
     document.querySelectorAll(".trigger-on-update").forEach((currentElem) => {
         currentElem.addEventListener("input", Trigger.runHtmlEventTrigger);
     });
@@ -392,3 +419,26 @@ export function init(options = {
 
     return loadPromise;
 }
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+    
+    
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Sun Jan 20 2019 21:55:46 GMT+0100 (Mitteleuropäische Normalzeit) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/linenumber.js"></script>
+
+
+</body>
+</html>

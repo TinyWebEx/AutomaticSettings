@@ -7,13 +7,13 @@
  * This prevents unnecessary flackering when the CSS is added and the browser needs to
  * re-parse/render the HTML.
  *
- * @module modules/MobileOptions
+ * @public
+ * @module MobileOptions
  */
 
 /**
  * Returns whether the current runtime is a mobile one (true) or not (false).
  *
- * @function
  * @private
  * @returns {Promise} with Boolean
  */
@@ -33,7 +33,7 @@ async function isMobile() {
  * Currently this just adds a CSS class.
  * You can e.g. use this to disable all incompatible options on mobile devices.
  *
- * @private
+ * @public
  * @returns {Promise}
  */
 export async function init() {

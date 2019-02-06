@@ -990,6 +990,44 @@ describe("options module: AutomaticSettings", function () {
             const newOption = await browser.storage.sync.get("sizeType");
             chai.assert.propertyVal(newOption, "sizeType", "threeValue");
         });
+
+        it("saves fieldset (radiogroup) value correctly if bound to single elements", async function () {
+            await setupOptionToTest(`<li>
+            <fieldset id="sizeGroup" data-type="radiogroup" class="setting">
+                <legend>set mode</legend>
+                <ul>
+                    <li>
+                        <input id="sizeOne" type="radio" name="sizeType" value="oneValue" class="save-on-input">
+                        <label for="sizeOne">Size one</label>
+
+                        <input class="notASetting" type="number" id="unrelatedOption" name="uugh">
+                        <span>px</span>
+                    </li>
+
+                    <li>
+                        <input id="sizeTwo" type="radio" name="sizeType" value="twoValue" class="save-on-input">
+                        <label for="sizeTwo">Size two</label>
+                    </li>
+
+                    <li>
+                        <input id="sizeThree" type="radio" name="sizeType" value="threeValue" class="save-on-input">
+                        <label for="sizeThree">Size three</label>
+                    </li>
+                </ul>
+            </fieldset>
+            </li>`, "sizeType", "sizeGroup", "twoValue");
+
+            // change option
+            document.getElementById("sizeTwo").removeAttribute("checked");
+            document.getElementById("sizeThree").setAttribute("checked", true);
+            changeExampleOptionInput("sizeThree"); // only to trigger event
+
+            await wait(5);
+
+            // verify option is saved
+            const newOption = await browser.storage.sync.get("sizeType");
+            chai.assert.propertyVal(newOption, "sizeType", "threeValue");
+        });
     });
 
     describe("option group", function () {
@@ -1031,7 +1069,7 @@ describe("options module: AutomaticSettings", function () {
         async function setExampleOptionGroup() {
             await setupOptionToTest(`<li>
             <fieldset id="sizeType" data-type="radiogroup" data-optiongroup="goodOptions" class="setting save-on-input">
-                <legend >set mode</legend>
+                <legend>set mode</legend>
                 <ul>
                     <li>
                         <input id="sizeOne" type="radio" name="sizeType" value="oneValue">
@@ -1052,10 +1090,10 @@ describe("options module: AutomaticSettings", function () {
                     </li>
                 </ul>
             </fieldset>
-            </li>
-            <li>
-                <input class="setting save-on-input" data-optiongroup="goodOptions" type="text" name="anotherSetting" id="anotherOption">
-            </li>`, "goodOptions", "", {
+        </li>
+        <li>
+            <input class="setting save-on-input" data-optiongroup="goodOptions" type="text" name="anotherSetting" id="anotherOption">
+        </li>`, "goodOptions", "", {
                 sizeType: "oneValue",
                 partialSetting: 8421,
                 anotherSetting: "withSomeText"

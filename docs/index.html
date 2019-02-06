@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    
+    <meta charset="utf-8">
+    <title>Home - Documentation</title>
+    
+    
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav >
+    
+    <h2><a href="index.html">Home</a></h2><h2><a href="https://github.com/TinyWebEx/" >All TinyWebExt modules</a></h2><h3>Modules</h3><ul><li><a href="module-AutomaticSettings.html">AutomaticSettings</a><ul class='methods'><li data-type='method'><a href="module-AutomaticSettings.html#.init">init</a></li><li data-type='method'><a href="module-AutomaticSettings.html#.setDefaultOptionProvider">setDefaultOptionProvider</a></li></ul></li><li></li><li></li><li><a href="module-AutomaticSettings_Trigger.html">AutomaticSettings/Trigger</a><ul class='methods'><li data-type='method'><a href="module-AutomaticSettings_Trigger.html#~addCustomLoadOverride">addCustomLoadOverride</a></li><li data-type='method'><a href="module-AutomaticSettings_Trigger.html#~addCustomSaveOverride">addCustomSaveOverride</a></li><li data-type='method'><a href="module-AutomaticSettings_Trigger.html#~overrideContinue">overrideContinue</a></li><li data-type='method'><a href="module-AutomaticSettings_Trigger.html#~registerAfterLoad">registerAfterLoad</a></li><li data-type='method'><a href="module-AutomaticSettings_Trigger.html#~registerBeforeLoad">registerBeforeLoad</a></li><li data-type='method'><a href="module-AutomaticSettings_Trigger.html#~registerChange">registerChange</a></li><li data-type='method'><a href="module-AutomaticSettings_Trigger.html#~registerSave">registerSave</a></li><li data-type='method'><a href="module-AutomaticSettings_Trigger.html#~registerUpdate">registerUpdate</a></li><li data-type='method'><a href="module-AutomaticSettings_Trigger.html#~unregisterAll">unregisterAll</a></li></ul></li><li><a href="module-MobileOptions.html">MobileOptions</a><ul class='methods'><li data-type='method'><a href="module-MobileOptions.html#.init">init</a></li></ul></li></ul>
+</nav>
+
+<div id="main">
+    
+
+    
+
+
+
+    
+
+
+    <section class="readme">
+        <article><h1 id="tinywebex-automaticsettings">TinyWebEx AutomaticSettings</h1>
+<p>A simple module that allows you to specify your add-on settings in HTML-only, so you can focus on adding settings and not care about how to load and save them. This means you do not have to write any custom JavaScript!<br>It is also designed to be used with settings pages that save their settings automatically. There is no need for an &quot;OK&quot; button or similar confirmation after the user entered the data.</p>
+<h2 id="features">Features</h2>
+<ul>
+<li>supports <a href="https://developer.mozilla.org/docs/Mozilla/Add-ons/WebExtensions/API/storage/managed">&quot;managed options&quot;</a>, i.e. loads options from the managed storage and marks them as &quot;unchangable&quot;, i.e. disabled.</li>
+<li>can automatically load all options into your HTML</li>
+<li>can automatically save all options in a useful data format (number values are also saved as numbers, not strings)</li>
+<li><a href="#option-groups">saving multiple options grouped together in JS objects</a></li>
+<li><a href="https://github.com/TinyWebEx/MessageHandler">MessageHandler integration</a>, e.g. to show errors when saving or loading an option fails, or to show a message if some managed options are used.</li>
+</ul>
+<h2 id="usage">Usage</h2>
+<p>It mostly just works with some additions to your HTML code. The HTML code itself can be quite flexible then:</p>
+<ul>
+<li><code>class=&quot;setting&quot;</code> attached to an <code>input</code> HTML tag enables the loading of this setting. It is thus required.</li>
+<li>The <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/Input#name">name attribute</a> (e.g. <code>name=&quot;greatSettingsNum&quot;</code>) must be properly specified and is used for saving the option in the <code>sync</code> storage. </li>
+<li>Add a class via <code>class=&quot;save-on-change&quot;</code> if the setting should be automatically saved when it is <a href="https://developer.mozilla.org/docs/Web/Events/change">changed</a>.</li>
+<li>Otherwise add <code>class=&quot;save-on-input&quot;</code> if the setting should be automatically saved when it the <a href="https://developer.mozilla.org/docs/Web/Events/input">input event</a> is triggered. This is e.g. useful when the simple change of an element is not enough to trigger a save. See the examples below on where that may be useful.</li>
+<li>You can optionally bind to different evens and validate entered data or overwrite loading and saving procedures via JavaScript.</li>
+<li>Note that input fields that are disabled are never saved and their input/update events are ignored. Managed options are set to this disabled state, so that these are ignored.</li>
+</ul>
+<h2 id="examples">Examples</h2>
+<p>Obviously the examples below are minimal examples. Please anyway use proper HTML markup with <code>label</code> and so on. You can add almost any elements anywhere. This has just nothing to do with this add-on. 🙂</p>
+<h3 id="checkbox">Checkbox</h3>
+<p>This e.g. changes a boolean (true/false) setting as <code>isEnabledSetting</code>:</p>
+<pre class="prettyprint source lang-html"><code>&lt;input class=&quot;setting save-on-change&quot; type=&quot;checkbox&quot; id=&quot;idForCss&quot; name=&quot;isEnabledSetting&quot;></code></pre><h3 id="number">Number</h3>
+<p>This e.g. changes a numeric value setting as <code>greatSettingsNum</code>:</p>
+<pre class="prettyprint source lang-html"><code>&lt;input class=&quot;setting save-on-change&quot; id=&quot;testSetting&quot; name=&quot;greatSettingsNum&quot; type=&quot;number&quot;></code></pre><h3 id="select-element">Select element</h3>
+<p>To select a single value and save it as <code>select</code>:</p>
+<pre class="prettyprint source lang-html"><code>&lt;select id=&quot;selection&quot; class=&quot;setting save-on-input&quot; name=&quot;select&quot; size=&quot;0&quot;>
+    &lt;option value=&quot;L&quot;>Low (7%)&lt;/option>
+    &lt;option value=&quot;M&quot;>Medium (15%)&lt;/option>
+    &lt;option value=&quot;Q&quot;>Quartile (25%)&lt;/option>
+    &lt;option value=&quot;H&quot;>High (30%)&lt;/option>
+&lt;/select></code></pre><h3 id="radio-options">Radio options</h3>
+<p>To create <a href="https://developer.mozilla.org/docs/Web/HTML/Element/input/radio">radio buttons</a> you have follow some special handling.</p>
+<pre class="prettyprint source lang-html"><code>&lt;fieldset id=&quot;sizeGroup&quot; data-type=&quot;radiogroup&quot; class=&quot;setting save-on-input&quot;>
+    &lt;legend>set mode&lt;/legend>
+    &lt;ul>
+        &lt;li>
+            &lt;input id=&quot;sizeOne&quot; type=&quot;radio&quot; name=&quot;sizeType&quot; value=&quot;oneValue&quot;>
+            &lt;label for=&quot;sizeOne&quot;>Size one&lt;/label>
+        &lt;/li>
+
+        &lt;li>
+            &lt;input id=&quot;sizeTwo&quot; type=&quot;radio&quot; name=&quot;sizeType&quot; value=&quot;twoValue&quot;>
+            &lt;label for=&quot;sizeTwo&quot;>Size two&lt;/label>
+        &lt;/li>
+
+        &lt;li>
+            &lt;input id=&quot;sizeThree&quot; type=&quot;radio&quot; name=&quot;sizeType&quot; value=&quot;threeValue&quot;>
+            &lt;label for=&quot;sizeThree&quot;>Size three&lt;/label>
+        &lt;/li>
+    &lt;/ul>
+&lt;/fieldset></code></pre><p>You have to:</p>
+<ul>
+<li>add <code>data-type=&quot;radiogroup&quot;</code> to mark the container of the radio options as a radiogroup.</li>
+<li>if you use a <code>fieldset</code> you can bind the save trigger to this fieldset as shown above, or to each individual <code>input type=&quot;radio&quot;</code>. It's just easy to forget one element if you specify it individually, that's why the behaviour shown above is recommended.</li>
+<li>Note, however, that it is always required to add the <code>setting</code> class to the container (i.e. <code>fieldset</code>), to enable the loading of this setting. Note that this is <em>not</em> required for the indidual options.
+It can be useful, however, to prevent multiple triggers, if you e.g. have other options inside of the fieldset. These are e.g. also automatically triggered when a chield input is triggered, so this can lead to it being saved multiple times. This usually is not a (noteworthy) problem, but you can see it in the console log messages.</li>
+</ul>
+<h2 id="option-groups">Option groups</h2>
+<p>A usual use case is to save multiple options in a JavaScript object, i.e. something like this:</p>
+<pre class="prettyprint source lang-js"><code>groupName = {
+  size: 170,
+  sizeType: &quot;auto&quot;,
+  ignoreUserSize: true
+};</code></pre><p>This is natively supported by this add-on. Just add an attribute <code>data-optiongroup=&quot;groupName&quot;</code> to all the options that you want to have grouped in an object. This can e.g. be useful if you have a <a href="#radio-options">radio group</a> with sub-options that you want to have saved with the value of the radio buttons themselves.
+For instance, the following HTML would result in the object shown above:</p>
+<pre class="prettyprint source lang-html"><code>&lt;li>
+    &lt;fieldset id=&quot;sizeType&quot; data-type=&quot;radiogroup&quot; data-optiongroup=&quot;groupName&quot; class=&quot;setting&quot;>
+        &lt;legend>set mode&lt;/legend>
+        &lt;ul>
+            &lt;li>
+                &lt;input id=&quot;sizeOne&quot; type=&quot;radio&quot; name=&quot;sizeType&quot; value=&quot;auto&quot; class=&quot;save-on-input&quot;>
+                &lt;label for=&quot;sizeOne&quot;>Size auto&lt;/label>
+
+                &lt;input class=&quot;setting save-on-input&quot; type=&quot;number&quot; data-optiongroup=&quot;groupName&quot; name=&quot;size&quot; id=&quot;partialSettingId&quot;>
+                &lt;span>px&lt;/span>
+            &lt;/li>
+
+            &lt;li>
+                &lt;input id=&quot;sizeTwo&quot; type=&quot;radio&quot; name=&quot;sizeType&quot; value=&quot;manual&quot; class=&quot;save-on-input&quot;>
+                &lt;label for=&quot;sizeTwo&quot;>Size manual&lt;/label>
+            &lt;/li>
+
+            &lt;li>
+                &lt;input id=&quot;sizeThree&quot; type=&quot;radio&quot; name=&quot;sizeType&quot; value=&quot;whatever&quot; class=&quot;save-on-input&quot;>
+                &lt;label for=&quot;sizeThree&quot;>Size whatever&lt;/label>
+            &lt;/li>
+        &lt;/ul>
+    &lt;/fieldset>
+&lt;/li>
+&lt;li>
+    &lt;input class=&quot;setting save-on-change&quot; data-optiongroup=&quot;groupName&quot; type=&quot;checkbox&quot; name=&quot;ignoreUserSize&quot; id=&quot;anotherOption&quot;>
+&lt;/li></code></pre><h2 id="loading-the-settings">Loading the settings</h2>
+<p>To enable this plugin, you still a few lines of JavaScript - respectively one line:</p>
+<pre class="prettyprint source lang-js"><code>AutomaticSettings.init();</code></pre><p>This does load the options and registers bindings etc.</p>
+<p>Obviously you need to pay attention to the fact to only do this after the DOM has been loaded, i.e. <a href="https://developer.mozilla.org/docs/Web/HTML/Element/script#attr-defer">the script should be deferred</a>.</p>
+<h2 id="trigger">Trigger</h2>
+<p>You can additionally intercept loading and saving some settings or check the validity or similar things of some settings via JavaScript. This is all done via <code>AutomaticSettings.Trigger</code>.
+In most cases, you always pass the registration functions the name of the option to be saved as a string and the function that you want to register as a callback. Most triggers are valid for a single option, whose name you specify, in order to prevent that 
+You can register as many triggers, as you want.</p>
+<p>Generally, it is recommend to register all triggers <em>before</em> calling the <a href="#loading-the-settings"><code>init</code> method</a> of this module, but it also works to register triggers at any time.</p>
+<h3 id="update-change-trigger">Update &amp; Change trigger</h3>
+<p>You can use <code>AutomaticSettings.Trigger.registerUpdate</code> or <code>AutomaticSettings.Trigger.registerChange</code> to register a custom callback that is executed when the user updates (triggered by <a href="https://developer.mozilla.org/docs/Web/Events/input">input</a>) or <a href="https://developer.mozilla.org/docs/Web/Events/change">changes</a> an input option.</p>
+<p>In both cases, you get the <code>optionValue</code> of the setting, the option name and the original event that triggered the request, so you can also find out the HTML element.</p>
+<p>This is mostly useful if some options depend on each other (that happens often when using <a href="#option-groups">option groups</a> e.g.), so you can interactively disable elements based on the user selection/input; or, if you want top verify the data the user entered and show some warnings or so.</p>
+<p>Note however, that this way is seperate from the whole loading &amp; saving of the data, so you cannot prevent an invalid value from being saved or so, here. Do <a href="#overwriting-loading-and-saving-behaviour">overwrite the loading or saving behaviour</a> if you want to do this.</p>
+<p>Note that you need to add the additional classes <code>trigger-on-update</code> (for the update trigger/<code>registerUpdate</code>) or <code>trigger-on-change</code> (for the input trigger/<code>registerChange</code>) to the respective options, to make this feature work. Without it, the library does not bind to these elements.</p>
+<h3 id="save-trigger">Save trigger</h3>
+<p>You can use <code>AutomaticSettings.Trigger.registerSave</code> to register a &quot;save trigger&quot; that is executed when an option is saved (actually directly before it is saved).
+It is thus quite useful to automatically apply the option or send it to other parts of the browser extension, so they are notified that a the value of the option changed. This is a useful feature for your usability, because the <code>AutomaticSetings</code> module automatically saves all options, so they should also automatically be applied, so the user immediately sees the difference.</p>
+<p>You can also use it to validate the input and cancel saving, you need to throw some errors then. Note that you should then show an appropiate error message yourself, as this error is not catched by the library - in contrast to everything else that happens afterwards, i.e. the saving of the option itself, e.g.</p>
+<h3 id="triggers-before-and-after-loading">Triggers before and after loading</h3>
+<p>When the triggers are used as expected, you usually get to one problem: Directly after your options have been loaded, you may see an inconsistent state, as your <a href="#save-trigger">save triggers</a> did not yet run and no checks on the previously loaded data is done, etc.</p>
+<p>To solve this, there is <code>AutomaticSettings.Trigger.registerAfterLoad</code>, which can be used to register a handler that is run after <em>all</em> settings have been loaded. To make it easier to implement you can even pass it the special variable <code>AutomaticSettings.Trigger.RUN_ALL_SAVE_TRIGGER</code> that tells it to automatically execute all save triggers, you have registered. This is usually what you want. 🙂</p>
+<p>Similarly there is <code>AutomaticSettings.Trigger.registerBeforeLoad</code> to let you execute stuff before any option is loaded.</p>
+<h3 id="overwriting-loading-and-saving-behaviour">Overwriting loading and saving behaviour</h3>
+<p>Sometimes it is needed to present data to the user in one way, but save it in another way. Thus, you need to manipulate how data is loaded or saved.
+If <a href="#option-groups">option groups</a> are not enough for you, you can use <code>AutomaticSettings.Trigger.addCustomLoadOverride</code> and <code>AutomaticSettings.Trigger.addCustomSaveOverride</code> to override the respective features.</p>
+<p>As always in these triggers, you get some information about the option that is loaded/saved and can check that. However, in addition you can get the data returned by your <a href="#save-trigger">save trigger</a> in <code>saveTriggerValues</code>, so you can re-use it.</p>
+<p>In contrast to the <a href="#save-trigger">save triggers</a> you can also actually influence/overwrite whether/how the value is loaded/saved. By default, the library assumes you now handle loading and saving by yourself, i.e. you need to interact with the HTML DOM (for loading) or the storage API (for saving) directly. By all means, you are overwriting the loading/saving process...<br>However, you can also return a special value that is returned by <code>AutomaticSettings.Trigger.overrideContinue</code> to indicate you want to continue saving/loading, but use different data for it, i.e. you just modify the data to load/save. You just pass it the value you want to continue the process.</p>
+<p>In the end, it can e.g. look like this:</p>
+<pre class="prettyprint source lang-js"><code>/**
+ * Saves the option XY.
+ *
+ * @private
+ * @param {Object} param
+ * @param {Object} param.optionValue the value of the changed option
+ * @param {string} param.option the name of the option that has been changed
+ * @param {Array} param.saveTriggerValues all values returned by potentially
+ *                                          previously run save triggers
+ * @returns {Promise}
+ */
+function saveOptionXy(param) {
+    // our proper data is saved in saveTriggerValues by previously run save trigger
+    const newOption = param.saveTriggerValues[0];
+
+    return AutomaticSettings.Trigger.overrideContinue(newOption);
+}</code></pre><h2 id="api-note">API note</h2>
+<p>Everything in the <code>internal</code> dir is considered to be an internal module/file and thus not be considered to be an API under <em>semantic versioning</em>. That means the API there can change at any time, do <em>not</em> import anything from there!</p></article>
+    </section>
+
+
+
+
+
+
+    
+    
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Sun Jan 20 2019 22:24:02 GMT+0100 (Mitteleuropäische Normalzeit) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/linenumber.js"></script>
+
+
+</body>
+</html>

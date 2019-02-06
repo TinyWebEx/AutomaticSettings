@@ -1,9 +1,9 @@
 /**
  * Load, save and apply options to HTML options page.
  *
- * @module modules/AutomaticSettings
- * @requires internal/Trigger
- * @requires internal/LoadAndSave
+ * @public
+ * @module AutomaticSettings
+ * @requires AutomaticSettings/Trigger
  */
 
 // import and expose module parts
