@@ -58,7 +58,7 @@ async function saveOption(event) {
     try {
         const result = await Trigger.runOverrideSave(option, optionValue, saveTriggerValue, event);
 
-        // destructre data, if it has been returned
+        // destructure data, if it has been returned
         if (result.command === Trigger.CONTINUE_RESULT) {
             ( {option = option, optionValue = optionValue} = result.data );
         }

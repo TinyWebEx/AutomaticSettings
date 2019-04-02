@@ -178,17 +178,22 @@ export async function runOverrideSave(option, optionValue, saveTriggerValues, ev
     // default event parameter to empty object
     event = event || {};
 
-    let lastPromise = Promise.resolve({
-        option,
-        optionValue,
-        saveTriggerValues,
-        event
-    });
-
+    let result;
     for (const trigger of allRegisteredOverrides) {
-        lastPromise = await lastPromise.then(trigger.triggerFunc);
+        result = await trigger.triggerFunc({
+            option,
+            optionValue,
+            saveTriggerValues,
+            event
+        });
+
+        // destructure data, if it has been returned, so next call can
+        // potentially also use it
+        if (result.command === CONTINUE_RESULT) {
+            ( {option = option, optionValue = optionValue} = result.data );
+        }
     }
-    return lastPromise;
+    return result;
 }
 
 /**
@@ -209,6 +214,8 @@ export async function runOverrideSave(option, optionValue, saveTriggerValues, ev
  * @returns {Object}
  */
 function overrideContinue(optionValue, option, elOption) {
+    // This can later be upgraded to return a proper Promise via Promise.resolve(),
+    // but it does not seem neccessary right now.
     return {
         command: CONTINUE_RESULT,
         data: {
@@ -231,7 +238,7 @@ function overrideContinue(optionValue, option, elOption) {
 * @param {Object} optionValues result of a storage.[…].get call, which
 *                  contains the values that should be applied to the file
 * @returns {Promise}
-* @see {@link overrideSave}
+* @see {@link overrideLoad}
 */
 export async function runOverrideLoad(option, optionValue, elOption, optionValues) {
     // run all registered triggers for that option
@@ -242,17 +249,22 @@ export async function runOverrideLoad(option, optionValue, elOption, optionValue
 
     console.info("runOverrideLoad:", `${allRegisteredOverrides.length}x`, option, optionValue);
 
-    let lastPromise = Promise.resolve({
-        option,
-        optionValue,
-        elOption,
-        optionValues
-    });
-
+    let result;
     for (const trigger of allRegisteredOverrides) {
-        lastPromise = await lastPromise.then(trigger.triggerFunc);
+        result = await trigger.triggerFunc({
+            option,
+            optionValue,
+            elOption,
+            optionValues
+        });
+
+        // destructure data, if it has been returned, so next call can
+        // potentially also use it
+        if (result.command === CONTINUE_RESULT) {
+            ( {option = option, optionValue = optionValue, elOption = elOption} = result.data );
+        }
     }
-    return lastPromise;
+    return result;
 }
 
 /**
