@@ -106,8 +106,23 @@ function getOptionGroupOrOption(option, optionGroup, optionValues) {
 export function getOptionValueFromRequestResults(option, optionGroup, optionValues) {
     let optionValue;
 
+    // need to start with true, to allow "concatenation"
+    let shouldQueryDefault = true;
+
+    if (optionGroup === null) {
+        // do not get default, if it has already been passed directly
+        shouldQueryDefault = shouldQueryDefault && !(option in optionValues);
+    } else {
+        shouldQueryDefault = shouldQueryDefault && (
+            // do not get default, if it a group is loaded and the group has already been passed
+            !(optionGroup in optionValues) ||
+            // and the loaded values actually contains the value we want
+            !(option in optionValues[optionGroup])
+        );
+    }
+
     // get default value if value is not passed
-    if (!(option in optionValues) && !(optionGroup in optionValues)) {
+    if (shouldQueryDefault) {
         if (optionGroup === null) {
             optionValue = getDefaultOption(option);
         } else {
