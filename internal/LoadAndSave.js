@@ -10,7 +10,7 @@
  */
 
 // common modules
-import debounce from "/common/modules/lodash/debounce.js";
+import debounce from "../../lodash/debounce.js";
 import * as CommonMessages from "../../MessageHandler/CommonMessages.js";
 
 // import internal modules
