@@ -330,7 +330,7 @@ describe("options module: AutomaticSettings", function () {
             <div id="messageSuccess" class="message-box success invisible fade-hide">
                 <span class="message-text">That worked!</span>
                 <a href="#">
-                    <button class="message-action-button micro-button success invisible"></button>
+                    <button type="button" class="message-action-button micro-button success invisible"></button>
                 </a>
                 <img class="icon-dismiss invisible" src="/common/img/close.svg" width="24" height="24" tabindex="0" data-i18n data-i18n-aria-label="__MSG_dismissIconDescription__"></span>
             </div>
