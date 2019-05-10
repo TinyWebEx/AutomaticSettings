@@ -81,7 +81,7 @@ li {
   align-items: center;
 }
 
-.line * {
+.line > * {
   /* https://design.firefox.com/photon/visuals/grid.html#spacing */
   margin: 0 8px 0 0;
 }
