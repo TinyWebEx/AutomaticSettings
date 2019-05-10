@@ -209,7 +209,7 @@ function saveOptionXy(param) {
 }
 ```
 
-## Reset buttons
+## Reset button
 
 Doc is TODO…
 
