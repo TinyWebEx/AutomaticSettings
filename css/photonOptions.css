@@ -77,7 +77,8 @@ li {
   padding: 2px 0;
   margin: 0 0 4px 0;
 
-  display: block;
+  display: flex;
+  align-items: center;
 }
 
 .line * {
@@ -96,12 +97,7 @@ li {
   display: inline;
 }
 
-/* when a "Learn more" link is used in a helper text, add margin */
+/* do not break "Learn more" links inside of the text */
 .learn-more {
-  margin-left: 4px;
-  overflow-wrap: none;
-}
-
-button {
-  padding: 4px 8px;
+  display: inline-block;
 }
