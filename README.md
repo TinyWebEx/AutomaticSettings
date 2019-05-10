@@ -10,6 +10,7 @@ It is also designed to be used with settings pages that save their settings auto
 * [saving multiple options grouped together in JS objects](#option-groups)
 * [MessageHandler integration](https://github.com/TinyWebEx/MessageHandler), e.g. to show errors when saving or loading an option fails, or to show a message if some managed options are used.
 * [can automatically let your reset button spring to live](#reset-button)
+* [contains a useful CSS file for adjusting your options for the Photon design](#css)
 
 ## Usage
 
@@ -211,6 +212,50 @@ function saveOptionXy(param) {
 ## Reset buttons
 
 Doc is TODO…
+
+## CSS
+
+In the file [`css/photonOptions.css`], there is a style for 
+
+Here is the corresponding HTML, if you want to use it:
+```html
+<body>
+  <form>
+    <!-- begin each new section, with a section tag, a line separate each
+    section from another
+    -->
+    <section>
+      <!-- Each section should have a title. -->
+      <h1>Section title</h1>
+      <!-- Add options in unordered lists. (bullet points will not be shown)
+      This is just for semantics.
+      -->
+      <ul>
+        <!-- Each option is a "list item" -->
+        <li>
+          <!-- To put options in one line, add a line class. -->
+          <div class="line">
+            <!-- Your option, as explained before. -->
+            <input class="setting save-on-change" type="checkbox" id="popupIconColored" name="popupIconColored">
+            <label for="popupIconColored">Colored icon</label>
+          </div>
+          <!-- use the indent class to indent a line as per it's checkbox -->
+          <div class="line indent">
+            <!-- .helper-text displays a grey text for explaining an option -->
+            <span class="helper-text">Shows a colored icon instead of the black/white icon in the toolbar.</span>
+          </div>
+        </li>
+      </ul>
+      
+      <!-- You can use h2 headings to add even more structure. -->
+      <h2>Subheading</h2>
+      
+      <!-- [...] -->
+    </section>
+  </form>
+</body>
+
+```
 
 ## API note
 
