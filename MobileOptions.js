@@ -1,9 +1,10 @@
 /**
  * Adjusts options page for mobile (Android) compatibility.
  *
- * Notice: You can include this asyncronously even if the whole DOM is not parsed yet.
+ * Notice: You can include this asyncronously even when the whole DOM is not parsed yet.
  * It only accesses the body tag and that is very likely available as it's likely one of
- * the first HTML tags you write and only include this script afterwards.
+ * the first HTML tags that is written and this script is obviously included afterwards
+ * in the head tag.
  * This prevents unnecessary flackering when the CSS is added and the browser needs to
  * re-parse/render the HTML.
  *
@@ -20,11 +21,7 @@
 async function isMobile() {
     const platformInfo = await browser.runtime.getPlatformInfo();
 
-    if (platformInfo.os !== "android") {
-        return false;
-    }
-
-    return true;
+    return platformInfo.os === "android";
 }
 
 /**
