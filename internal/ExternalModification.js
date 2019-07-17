@@ -33,7 +33,7 @@ export async function setOption(option, optionValue, optionGroup) {
     } else {
         // apply HTML
         await LoadAndSave.applyOption(option, optionGroup, elOption, { option: optionValue });
-        // now trihgger saving of modified values
+        // now trigger saving of modified values
         LoadAndSave.saveOption({target: elOption});
     }
 }
