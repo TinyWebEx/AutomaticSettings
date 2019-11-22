@@ -2,6 +2,30 @@
   --gray-separator: rgba(12, 12, 13, 0.15);
 }
 
+@media (prefers-color-scheme: dark) {
+  body {
+    background-color: #202023;
+    color: rgb(249, 249, 250);
+  }
+  h1, h2 {
+    color: rgb(249, 249, 250);
+  }
+  a {
+    color: var(--blue-40);
+  }
+  a:hover {
+    color: var(--blue-50);
+  }
+  a:hover:active {
+    color: var(--blue-60);
+  }
+
+  :root {
+    --gray-separator: #545457;
+    --in-content-deemphasized-text: var(--grey-40);
+  }
+}
+
 body {
   /* body20 */
   font-size: 15px;
@@ -93,7 +117,7 @@ li {
 .helper-text {
   /* caption30 */
   font-size: 15px;
-  color: var(--grey-50);
+  color: var(--in-content-deemphasized-text);
   display: inline;
 }
 
