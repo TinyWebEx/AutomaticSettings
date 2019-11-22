@@ -13,6 +13,7 @@
     <![endif]-->
     <link type="text/css" rel="stylesheet" href="styles/prettify.css">
     <link type="text/css" rel="stylesheet" href="styles/jsdoc.css">
+    <script src="scripts/nav.js" defer></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body>
@@ -95,6 +96,8 @@ const triggers = {
  * @callback saveTrigger
  * @param {Object} optionValue the value of the changed option
  * @param {string} option the name of the option that has been changed
+ * @param {Event} event the event (input or change) that triggered saving
+ *                      (may not always be defined, e.g. when loading)
  * @return {Promise} optionally, to use await
  */
 
@@ -112,6 +115,7 @@ const triggers = {
  * @param {string} param.option the name of the option that has been changed
  * @param {Array} param.saveTriggerValues all values returned by potentially
  *                                          previously run save triggers
+ * @param {Event} param.event the event (input or change) that triggered saving
  * @returns {Promise} recommend
  * @throws {Error} if saving e.g. fails, this will automatically trigger a generic
  *                  error to be shown in the UI
@@ -154,10 +158,14 @@ const triggers = {
  * @function
  * @param  {string} [option]
  * @param  {Object} [optionValue] will be automatically retrieved, if not given
+ * @param {Event} [event] the event (input or change) that triggered saving
  * @returns {Promise}
  * @see {@link saveTrigger}
  */
-export async function runSaveTrigger(option, optionValue) {
+export async function runSaveTrigger(option, optionValue, event = {}) {
+    // create object in case event is empty
+    event = event || {};
+
     if (option === undefined) {
         console.info("run all save triggers");
 
@@ -166,7 +174,7 @@ export async function runSaveTrigger(option, optionValue) {
             const option = trigger.option;
             const optionValue = await OptionsModel.getOption(option);
 
-            promises.push(trigger.triggerFunc(optionValue, option));
+            promises.push(trigger.triggerFunc(optionValue, option, event));
         }
         return Promise.all(promises);
     }
@@ -176,50 +184,60 @@ export async function runSaveTrigger(option, optionValue) {
         optionValue = await OptionsModel.getOption(option);
     }
 
-    console.info("runSaveTrigger:", option, optionValue);
+    console.info("runSaveTrigger:", option, optionValue, event);
 
     // run all registered triggers for that option
     const promises = [];
     for (const trigger of triggers.onSave.filter((trigger) => trigger.option === option)) {
-        promises.push(trigger.triggerFunc(optionValue, option));
+        promises.push(trigger.triggerFunc(optionValue, option, event));
     }
     return Promise.all(promises);
 }
 
 /**
-* Executes special handling for applying certain settings.
-*
-* E.g. when a setting is saved, it executes to apply some options live, so the
-* user immediately sees the change or the change is immediately applied.
-* If no parameters are passed, this gets and applies all options.
-*
-* @protected
-* @function
-* @param  {string} option
-* @param  {Object} optionValue
-* @param  {Array} saveTriggerValues value returned by potentially run safe triggers
-* @returns {Promise}
-* @see {@link overrideSave}
-*/
-export async function runOverrideSave(option, optionValue, saveTriggerValues) {
+ * Executes special handling for applying certain settings.
+ *
+ * E.g. when a setting is saved, it executes to apply some options live, so the
+ * user immediately sees the change or the change is immediately applied.
+ * If no parameters are passed, this gets and applies all options.
+ *
+ * @protected
+ * @function
+ * @param  {string} option
+ * @param  {Object} optionValue
+ * @param  {Array} saveTriggerValues value returned by potentially run safe triggers
+ * @param {Event} [event] the event (input or change) that triggered saving
+ * @returns {Promise}
+ * @see {@link overrideSave}
+ */
+export async function runOverrideSave(option, optionValue, saveTriggerValues, event = {}) {
     // run all registered triggers for that option
     const allRegisteredOverrides = triggers.overrideSave.filter((trigger) => trigger.option === option);
     if (allRegisteredOverrides.length === 0) {
         return Promise.resolve(NO_TRIGGERS_EXECUTED);
     }
 
-    console.info("runOverrideSave:", `${allRegisteredOverrides.length}x`, option, optionValue);
+    console.info("runOverrideSave:", `${allRegisteredOverrides.length}x`, option, optionValue, saveTriggerValues, event);
 
-    let lastPromise = Promise.resolve({
-        option,
-        optionValue,
-        saveTriggerValues
-    });
+    // default event parameter to empty object
+    event = event || {};
 
+    let result;
     for (const trigger of allRegisteredOverrides) {
-        lastPromise = await lastPromise.then(trigger.triggerFunc);
+        result = await trigger.triggerFunc({
+            option,
+            optionValue,
+            saveTriggerValues,
+            event
+        });
+
+        // destructure data, if it has been returned, so next call can
+        // potentially also use it
+        if (result.command === CONTINUE_RESULT) {
+            ( {option = option, optionValue = optionValue} = result.data );
+        }
     }
-    return lastPromise;
+    return result;
 }
 
 /**
@@ -240,6 +258,8 @@ export async function runOverrideSave(option, optionValue, saveTriggerValues) {
  * @returns {Object}
  */
 function overrideContinue(optionValue, option, elOption) {
+    // This can later be upgraded to return a proper Promise via Promise.resolve(),
+    // but it does not seem neccessary right now.
     return {
         command: CONTINUE_RESULT,
         data: {
@@ -262,7 +282,7 @@ function overrideContinue(optionValue, option, elOption) {
 * @param {Object} optionValues result of a storage.[…].get call, which
 *                  contains the values that should be applied to the file
 * @returns {Promise}
-* @see {@link overrideSave}
+* @see {@link overrideLoad}
 */
 export async function runOverrideLoad(option, optionValue, elOption, optionValues) {
     // run all registered triggers for that option
@@ -273,17 +293,22 @@ export async function runOverrideLoad(option, optionValue, elOption, optionValue
 
     console.info("runOverrideLoad:", `${allRegisteredOverrides.length}x`, option, optionValue);
 
-    let lastPromise = Promise.resolve({
-        option,
-        optionValue,
-        elOption,
-        optionValues
-    });
-
+    let result;
     for (const trigger of allRegisteredOverrides) {
-        lastPromise = await lastPromise.then(trigger.triggerFunc);
+        result = await trigger.triggerFunc({
+            option,
+            optionValue,
+            elOption,
+            optionValues
+        });
+
+        // destructure data, if it has been returned, so next call can
+        // potentially also use it
+        if (result.command === CONTINUE_RESULT) {
+            ( {option = option, optionValue = optionValue, elOption = elOption} = result.data );
+        }
     }
-    return lastPromise;
+    return result;
 }
 
 /**
@@ -322,7 +347,7 @@ export async function runOverrideLoad(option, optionValue, elOption, optionValue
  * @function
  * @param  {Event} event
  * @returns {void}
- * @throws {Error}
+ * @throws {TypeError}
  */
 export function runHtmlEventTrigger(event) {
     const elOption = event.target;
@@ -339,7 +364,7 @@ export function runHtmlEventTrigger(event) {
         triggerType = "onChange";
         break;
     default:
-        throw new Error("invalid event type attached");
+        throw new TypeError("invalid event type attached");
     }
 
     // run all registered triggers for that option
@@ -600,11 +625,13 @@ export default {
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Sun Jan 20 2019 22:24:02 GMT+0100 (Mitteleuropäische Normalzeit) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.2</a> on Sun Jun 30 2019 23:06:55 GMT+0200 (GMT+02:00) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
 </footer>
 
 <script>prettyPrint();</script>
+<script src="scripts/polyfill.js"></script>
 <script src="scripts/linenumber.js"></script>
+
 
 
 </body>
