@@ -1,5 +1,6 @@
 :root {
   --gray-separator: rgba(12, 12, 13, 0.15);
+  --in-content-deemphasized-text: var(--grey-50);
 }
 
 @media (prefers-color-scheme: dark) {
