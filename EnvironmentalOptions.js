@@ -1,5 +1,5 @@
 /**
- * Adjusts options page for mobile (Android) compatibility.
+* Adjusts options page for browser or system (mobile/Android) compatibility.
  *
  * Notice: You can include this asyncronously even when the whole DOM is not parsed yet.
  * It only accesses the body tag and that is very likely available as it's likely one of
@@ -16,12 +16,24 @@
  * Returns whether the current runtime is a mobile one (true) or not (false).
  *
  * @private
- * @returns {Promise} with Boolean
+ * @returns {Promise<bool>}
  */
 async function isMobile() {
     const platformInfo = await browser.runtime.getPlatformInfo();
 
     return platformInfo.os === "android";
+}
+
+/**
+* Returns whether the current browser is Firefox.
+*
+* @private
+* @returns {Promise<bool>}
+*/
+async function isFirefox() {
+    const browserInfo = await browser.runtime.getBrowserInfo();
+
+    return browserInfo.name === "Firefox";
 }
 
 /**
@@ -33,10 +45,19 @@ async function isMobile() {
  * @public
  * @returns {Promise}
  */
-export async function init() {
-    if (!(await isMobile())) {
-        return;
-    }
+export function init() {
+    isMobile.then((isCurrentlyMobile) => {
+        if (!isCurrentlyMobile) {
+            return;
+        }
+        document.querySelector("body").classList.add("mobile");
+    });
+    isFirefox.then((isCurrentlyFirefox) => {
+        if (!isCurrentlyFirefox) {
+            return;
+        }
+        document.querySelector("body").classList.add("firefox");
+    });
 
-    document.querySelector("body").classList.add("mobile");
+    return Promise.all([isMobile, isFirefox]);
 }

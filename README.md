@@ -215,7 +215,7 @@ Doc is TODO…
 
 ## CSS
 
-In the file [`css/photonOptions.css`], there is a style for 
+In the file [`css/photonOptions.css`], there is a style for a Firefox/[Photon](https://design.firefox.com/photon/)-style appearance of the settings.
 
 Here is the corresponding HTML, if you want to use it:
 ```html
@@ -256,6 +256,14 @@ Here is the corresponding HTML, if you want to use it:
 </body>
 
 ```
+
+## Automatically disabling options
+
+To automatically disable options depending on the environment, load the `EnvironmentalOptions.js` module and run `MobileOptions.init();`. You can even do that asynchronously with the `async` attribute at the `script` tag.
+
+If you do so, you can use two CSS classes:
+* You can use the CSS class `.mobile-incompatible` to mark options that are not compatible with Android/mobile devices. 
+* You can use the CSS class `.firefox-only` to mark options that are only compatible with the Mozilla Firefox browser. 
 
 ## API note
 

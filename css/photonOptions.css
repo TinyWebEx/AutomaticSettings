@@ -14,8 +14,11 @@ body.mobile {
   font-size: 14px;
 }
 
-/* disable all options incomaptible with mobile devices */
+/* disable all options incomaptible with current device/browser */
 body.mobile .mobile-incompatible {
+  display: none;
+}
+body.firefox .firefox-only {
   display: none;
 }
 
