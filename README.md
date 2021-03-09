@@ -263,7 +263,8 @@ To automatically disable options depending on the environment, load the `Environ
 
 If you do so, you can use two CSS classes:
 * You can use the CSS class `.mobile-incompatible` to mark options that are not compatible with Android/mobile devices. 
-* You can use the CSS class `.firefox-only` to mark options that are only compatible with the Mozilla Firefox browser. 
+* You can use the CSS class `.firefox-only` to mark options that are only compatible with the Mozilla Firefox browser.  **This does _not_ include Thunderbird
+* You can use the CSS class `.mozilla-only` to mark options that are only compatible with the Mozilla products like Mozilla Firefox and Thunderbird.
 
 ## API note
 

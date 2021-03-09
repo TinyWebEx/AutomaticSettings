@@ -46,6 +46,9 @@ body.mobile .mobile-incompatible {
 body:not(.firefox) .firefox-only {
   display: none;
 }
+body:not(.mozilla) .mozilla-only {
+  display: none;
+}
 
 /* https://design.firefox.com/photon/patterns/inactive.html */
 [disabled],

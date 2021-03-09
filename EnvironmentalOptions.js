@@ -25,7 +25,23 @@ async function isMobile() {
 }
 
 /**
+* Returns whether the current browser is from Mozilla.
+*
+*  This includes Firefox and Thunderbird e.g.
+*
+* @private
+* @returns {Promise<bool>}
+*/
+async function isMozilla() {
+    const browserInfo = await browser.runtime.getBrowserInfo();
+
+    return browserInfo.vendor === "Mozilla";
+}
+
+/**
 * Returns whether the current browser is Firefox.
+*
+*  This does not include Thunderbird!
 *
 * @private
 * @returns {Promise<bool>}
@@ -57,6 +73,12 @@ export function init() {
             return;
         }
         document.querySelector("body").classList.add("firefox");
+    });
+    isMozilla().then((isCurrentlyMozilla) => {
+        if (!isCurrentlyMozilla) {
+            return;
+        }
+        document.querySelector("body").classList.add("mozilla");
     });
 
     return Promise.all([isMobile, isFirefox]);
