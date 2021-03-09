@@ -46,13 +46,13 @@ async function isFirefox() {
  * @returns {Promise}
  */
 export function init() {
-    isMobile.then((isCurrentlyMobile) => {
+    isMobile().then((isCurrentlyMobile) => {
         if (!isCurrentlyMobile) {
             return;
         }
         document.querySelector("body").classList.add("mobile");
     });
-    isFirefox.then((isCurrentlyFirefox) => {
+    isFirefox().then((isCurrentlyFirefox) => {
         if (!isCurrentlyFirefox) {
             return;
         }
