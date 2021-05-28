@@ -165,6 +165,11 @@ function setManagedOption(option, optionGroup, elOption = getElementFromOptionId
     }
 
     return gettingOption.then((res) => {
+        // This ensures Chrom/ium compatbility, see https://github.com/TinyWebEx/AutomaticSettings/issues/12
+        if (!res || Object.keys(res).length === 0) {
+            return Promise.reject();
+        };
+        
         showManagedInfo();
 
         console.info("managed config found", res, elOption);
