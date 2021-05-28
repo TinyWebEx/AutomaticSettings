@@ -35,7 +35,10 @@ async function isMobile() {
 async function isMozilla() {
     const browserInfo = await browser.runtime.getBrowserInfo();
 
-    return browserInfo.vendor === "Mozilla";
+    // Thunderbird is explicitly checked as a workaround as Thunderbird does not return the vendor correctly
+    // see https://bugzilla.mozilla.org/show_bug.cgi?id=1702722
+    // and https://github.com/TinyWebEx/AutomaticSettings/issues/11
+    return browserInfo.vendor === "Mozilla" || browserInfo.name === "Thunderbird";
 }
 
 /**
