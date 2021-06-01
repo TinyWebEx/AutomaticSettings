@@ -15,10 +15,10 @@
 /**
  * Returns whether the current runtime is a mobile one (true) or not (false).
  *
- * @private
+ * @public
  * @returns {Promise<bool>}
  */
-async function isMobile() {
+ export async function isMobile() {
     const platformInfo = await browser.runtime.getPlatformInfo();
 
     return platformInfo.os === "android";
@@ -29,10 +29,10 @@ async function isMobile() {
 *
 *  This includes Firefox and Thunderbird e.g.
 *
-* @private
+* @public
 * @returns {Promise<bool>}
 */
-async function isMozilla() {
+export async function isMozilla() {
     const browserInfo = await browser.runtime.getBrowserInfo();
 
     // Thunderbird is explicitly checked as a workaround as Thunderbird does not return the vendor correctly
@@ -46,10 +46,10 @@ async function isMozilla() {
 *
 *  This does not include Thunderbird!
 *
-* @private
+* @public
 * @returns {Promise<bool>}
 */
-async function isFirefox() {
+export async function isFirefox() {
     const browserInfo = await browser.runtime.getBrowserInfo();
 
     return browserInfo.name === "Firefox";
