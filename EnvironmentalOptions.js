@@ -13,12 +13,29 @@
  */
 
 /**
- * Returns whether the current runtime is a mobile one (true) or not (false).
+ * Return the browser's browser info or fallback to an empty object.
+ *
+ * This is a workaround for Chrome/ium browsers that do not support runtime.getBrowserInfo().
+ * See https://github.com/TinyWebEx/AutomaticSettings/issues/18
  *
  * @private
  * @returns {Promise<bool>}
  */
-async function isMobile() {
+async function getBrowserInfo() {
+    if (!browser.runtime.getBrowserInfo) {
+        return {};
+    }
+
+    return await browser.runtime.getBrowserInfo();
+}
+
+/**
+ * Returns whether the current runtime is a mobile one (true) or not (false).
+ *
+ * @public
+ * @returns {Promise<bool>}
+ */
+ export async function isMobile() {
     const platformInfo = await browser.runtime.getPlatformInfo();
 
     return platformInfo.os === "android";
@@ -29,11 +46,11 @@ async function isMobile() {
 *
 *  This includes Firefox and Thunderbird e.g.
 *
-* @private
+* @public
 * @returns {Promise<bool>}
 */
-async function isMozilla() {
-    const browserInfo = await browser.runtime.getBrowserInfo();
+export async function isMozilla() {
+    const browserInfo = await getBrowserInfo();
 
     // Thunderbird is explicitly checked as a workaround as Thunderbird does not return the vendor correctly
     // see https://bugzilla.mozilla.org/show_bug.cgi?id=1702722
@@ -46,11 +63,11 @@ async function isMozilla() {
 *
 *  This does not include Thunderbird!
 *
-* @private
+* @public
 * @returns {Promise<bool>}
 */
-async function isFirefox() {
-    const browserInfo = await browser.runtime.getBrowserInfo();
+export async function isFirefox() {
+    const browserInfo = await getBrowserInfo();
 
     return browserInfo.name === "Firefox";
 }
