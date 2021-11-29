@@ -1,0 +1,134 @@
+:root {
+  --gray-separator: rgba(12, 12, 13, 0.15);
+  --in-content-deemphasized-text: var(--grey-50);
+}
+
+@media (prefers-color-scheme: dark) {
+  body {
+    background-color: #202023;
+    color: rgb(249, 249, 250);
+  }
+  h1, h2 {
+    color: rgb(249, 249, 250);
+  }
+  a {
+    color: var(--blue-40);
+  }
+  a:hover {
+    color: var(--blue-50);
+  }
+  a:hover:active {
+    color: var(--blue-60);
+  }
+
+  :root {
+    --gray-separator: #545457;
+    --in-content-deemphasized-text: var(--grey-40);
+  }
+}
+
+body {
+  /* body20 */
+  font-size: 15px;
+  padding: 0 8px;
+}
+
+/* on (small) mobile displays */
+body.mobile {
+  /* smaller size -> default on Firefox for Android is 14px */
+  font-size: 14px;
+}
+
+/* disable all options incomaptible with current device/browser */
+body.mobile .mobile-incompatible {
+  display: none;
+}
+body:not(.firefox) .firefox-only {
+  display: none;
+}
+body:not(.mozilla) .mozilla-only {
+  display: none;
+}
+
+/* https://design.firefox.com/photon/patterns/inactive.html */
+[disabled],
+input[disabled] ~ label {
+  opacity: 0.4;
+}
+
+section {
+  margin-bottom: 32px;
+}
+
+hr {
+  border: 0;
+  height: 1px;
+  background-color: var(--gray-separator);
+}
+
+h1 {
+  margin: 32px 0 16px 0;
+  padding: 16px 0 0 0;
+
+  /* title30 */
+  font-size: 22px;
+  font-weight: 300;
+
+  border-top: 1px solid var(--gray-separator);
+}
+
+form section:first-child h1 {
+  border-top: none;
+  margin-top: 16px;
+}
+
+h2 {
+  /* title20 */
+  font-size: 17px;
+  font-weight: 600;
+  margin: 32px 0 16px 0;
+}
+
+ul {
+  margin: 0px;
+  padding: 0px;
+}
+/* still show padding if ul is used for indentation */
+ul ul {
+  padding-left: 40px;
+}
+
+li {
+  list-style-type: none;
+  margin-top: 10px;
+  padding: 0px;
+}
+
+.line {
+  padding: 2px 0;
+  margin: 0 0 4px 0;
+
+  display: flex;
+  align-items: center;
+}
+
+.line > * {
+  /* https://design.firefox.com/photon/visuals/grid.html#spacing */
+  margin: 0 8px 0 0;
+}
+
+.line.indent {
+  margin-inline-start: 28px;
+}
+
+.helper-text {
+  /* caption30 */
+  font-size: 15px;
+  color: var(--in-content-deemphasized-text);
+  display: inline;
+}
+
+/* do not break "Learn more" links inside of the text */
+.learn-more {
+  display: inline-block;
+}

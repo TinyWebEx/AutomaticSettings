@@ -54,7 +54,7 @@ const triggers = {
  * @param {string} option the name of the option that has been changed
  * @param {Event} event the event (input or change) that triggered saving
  *                      (may not always be defined, e.g. when loading)
- * @return {Promise} optionally, to use await
+ * @return {Promise|void} optionally, to use await
  */
 
 /**
