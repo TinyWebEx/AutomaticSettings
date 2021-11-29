@@ -9,7 +9,7 @@
  * re-parse/render the HTML.
  *
  * @public
- * @module MobileOptions
+ * @module EnvironmentalOptions
  */
 
 /**
