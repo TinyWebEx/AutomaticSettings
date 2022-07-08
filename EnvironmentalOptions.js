@@ -1,5 +1,5 @@
 /**
-* Adjusts options page for browser or system (mobile/Android) compatibility.
+ * Adjusts options page for browser or system (mobile/Android) compatibility.
  *
  * Notice: You can include this asyncronously even when the whole DOM is not parsed yet.
  * It only accesses the body tag and that is very likely available as it's likely one of
