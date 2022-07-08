@@ -217,7 +217,7 @@ Doc is TODO…
 
 In the file [`css/photonOptions.css`], there is a style for a Firefox/[Photon](https://design.firefox.com/photon/)-style appearance of the settings.
 
-To ub eble se the CSS file, you need to include the `common.css` from [`CommonCss`](https://github.com/TinyWebEx/CommonCss).
+To be able to use the CSS file, you need to include the `common.css` from [`CommonCss`](https://github.com/TinyWebEx/CommonCss).
 
 Here is the corresponding HTML, if you want to use it:
 ```html
