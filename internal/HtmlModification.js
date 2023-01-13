@@ -7,6 +7,7 @@
 
 // common modules
 import * as OptionsModel from "./OptionsModel.js";
+import * as DomModel from "./DomModel.js";
 
 /**
  * Applies option to element.
@@ -16,7 +17,7 @@ import * as OptionsModel from "./OptionsModel.js";
  *
  * @protected
  * @function
- * @param  {string} option string ob object ID
+ * @param  {string} option string ob object ID // TODO. UNUSED OPTION
  * @param  {Object} optionValue the value to set
  * @param  {HTMLElement} elOption where to apply feature
  * @returns {void}
@@ -153,7 +154,7 @@ export function getIdAndOptionsFromElement(elOption, useDatagroup = true) {
         optionValue = OptionsModel.getOptionGroup(optionGroup);
 
         // update data in group with new values from settings HTML page
-        document.querySelectorAll(`[data-optiongroup=${optionGroup}]`).forEach((elCurrentOption) => {
+        DomModel.getHtmlElementsOfOptionsGroup(optionGroup).forEach((elCurrentOption) => {
             const [currentOption, currentOptionValue] = getIdAndOptionFromElement(elCurrentOption);
             optionValue[currentOption] = currentOptionValue;
         });

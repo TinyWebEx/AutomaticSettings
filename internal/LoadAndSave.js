@@ -14,11 +14,12 @@ import debounce from "../../lodash/debounce.js";
 import * as CommonMessages from "../../MessageHandler/CommonMessages.js";
 
 // import internal modules
+import * as DomModel from "./DomModel.js";
 import * as Trigger from "./Trigger.js";
 import * as HtmlMod from "./HtmlModification.js";
 import * as OptionsModel from "./OptionsModel.js";
 
-const DEFAULT_DEBOUNCE_TIME = 250; // 250 ms
+const DEFAULT_DEBOUNCE_TIME = 250; // ms
 
 // vars
 let managedInfoIsShown = false;
@@ -28,12 +29,12 @@ let lastOptionsBeforeReset;
 /**
  * Saves the specific settings that triggered this.
  *
- * @private
+ * @package
  * @function
  * @param  {Object} event
  * @returns {void}
  */
-async function saveOption(event) {
+export async function saveOption(event) {
     /** @var {HTMLElement} */
     let elOption = event.target;
 
@@ -95,30 +96,17 @@ function showManagedInfo() {
 }
 
 /**
- * Get the name of the option from an element..
- *
- * @private
- * @function
- * @param {string} option
- * @returns {HTMLElement}
- */
-function getElementFromOptionId(option) {
-    return document.querySelector(`[name=${option}]`);
-}
-
-/**
  * Applies an option to the HTML element. This is the final step, before it goes
  * into the {@link HtmlMod} module.
  *
- * @private
- * @function
+ * @package
  * @param  {string} option string ob object ID
  * @param  {string|null} optionGroup optiom group, if it is used
  * @param  {HTMLElement} elOption where to apply feature
  * @param  {Object|undefined} optionValues object values
  * @returns {Promise}
  */
-async function applyOption(option, optionGroup, elOption, optionValues) {
+export async function applyOption(option, optionGroup, elOption, optionValues) {
     let optionValue = OptionsModel.getOptionValueFromRequestResults(option, optionGroup, optionValues);
 
     const overwriteResult = await Trigger.runOverrideLoad(option, optionValue, elOption, optionValues);
@@ -152,7 +140,7 @@ async function applyOption(option, optionGroup, elOption, optionValues) {
  *                                     be autodetected otherwise
  * @returns {Promise}
  */
-function setManagedOption(option, optionGroup, elOption = getElementFromOptionId(option)) {
+function setManagedOption(option, optionGroup, elOption = DomModel.getElementFromOptionId(option)) {
     if (optionGroup === undefined && elOption.hasAttribute("data-optiongroup")) {
         optionGroup = elOption.getAttribute("data-optiongroup");
     }
@@ -199,7 +187,7 @@ function setManagedOption(option, optionGroup, elOption = getElementFromOptionId
  *                                     be autodetected otherwise
  * @returns {Promise}
  */
-function setSyncedOption(option, optionGroup, elOption = getElementFromOptionId(option)) {
+function setSyncedOption(option, optionGroup, elOption = DomModel.getElementFromOptionId(option)) {
     if (optionGroup === undefined && elOption.hasAttribute("data-optiongroup")) {
         optionGroup = elOption.getAttribute("data-optiongroup");
     }
@@ -232,15 +220,12 @@ function setSyncedOption(option, optionGroup, elOption = getElementFromOptionId(
 export function loadOption(elOption, option) {
     option = option ? option : HtmlMod.getOptionIdFromElement(elOption);
 
-    let optionGroup = null;
-    if ("optiongroup" in elOption.dataset) {
-        optionGroup = elOption.dataset.optiongroup;
-    }
+    const optionGroup = DomModel.getOptionGroup(elOption);
 
     // try to get option ID from input element if needed
     if (!option && elOption.dataset.type === "radiogroup") {
         option = elOption.querySelector("input[type=radio]").getAttribute("name");
-    }
+    } // TODO: refactor this if to include in getOptionIdFromElement
 
     return setManagedOption(option, optionGroup, elOption).catch((error) => {
         /* only log warning as that is expected when no manifest file is found */
@@ -261,7 +246,7 @@ export function loadOption(elOption, option) {
  *                                be autodetected otherwise
  * @returns {Promise}
  */
-export function loadOptionByName(option, elOption = getElementFromOptionId(option)) {
+export function loadOptionByName(option, elOption = DomModel.getElementFromOptionId(option)) {
     return loadOption(elOption, option);
 }
 
