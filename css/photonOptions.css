@@ -112,6 +112,20 @@ li {
   align-items: center;
 }
 
+/* hides whole element getting rid of margin/paddings, if they contain only hidden childs
+   see https://stackoverflow.com/a/79145153/5008962
+*/
+@supports(selector(:has(div))) {
+  .line {
+    display: none
+  }
+
+  /* "unhides" all elements that contain at least one visible element */
+  .line:has(> :not(.invisible)) {
+    display: flex;
+  }
+}
+
 .line > * {
   /* https://design.firefox.com/photon/visuals/grid.html#spacing */
   margin: 0 8px 0 0;
