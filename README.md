@@ -261,7 +261,7 @@ Here is the corresponding HTML, if you want to use it:
 
 ## Automatically disabling options
 
-To automatically disable options depending on the environment, load the `EnvironmentalOptions.js` module and run `MobileOptions.init();`. You can even do that asynchronously with the `async` attribute at the `script` tag.
+To automatically disable options depending on the environment, load the `EnvironmentalOptions.js` module and run `EnvironmentalOptions.init();`. You can even do that asynchronously with the `async` attribute at the `script` tag.
 
 If you do so, you can use two CSS classes:
 * You can use the CSS class `.mobile-incompatible` to mark options that are not compatible with Android/mobile devices. 
