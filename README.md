@@ -177,7 +177,7 @@ To solve this, there is `AutomaticSettings.Trigger.registerAfterLoad`, which can
 
 Similarly there is `AutomaticSettings.Trigger.registerBeforeLoad` to let you execute stuff before any option is loaded like modifying an option.
 
-> ![WARNING]
+> [!WARNING] 
 > Please notice, the `AutomaticSettings.Trigger.registerBeforeLoad`  trigger has two important differences to all others:
 > 1. It does not support [option groups](#option-groups) in the sense that you can bind it to it and they get esxecuted. Instead you have to manually bind it to the inidvidual option.
 > 2. Contrary to other triggers, it also has a different function signature for the callback. This one gets an element with all useful values.
