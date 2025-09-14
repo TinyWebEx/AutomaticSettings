@@ -479,7 +479,11 @@ function addCustomSaveOverride(optionTrigger, callback) {
  * Registers a load trigger for special handling when loading an option.
  *
  * The trigger get the values (optionValue, option, …) passed as parameters.
- * See {@link overrideLoad} for details.
+ * See {@link overrideLoad} for details and note the difference to other triggers!
+ * **Attention:** Contrary to other triggers, this does also  _not_ support option
+ * groups for {@paramref optionTrigger}!
+ * Instead, please bind it to the individual option elements.
+ * 
  * Usually there should only be one of these triggers.
  *
  * @public

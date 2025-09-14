@@ -175,7 +175,12 @@ When the triggers are used as expected, you usually get to one problem: Directly
 
 To solve this, there is `AutomaticSettings.Trigger.registerAfterLoad`, which can be used to register a handler that is run after _all_ settings have been loaded. To make it easier to implement you can even pass it the special variable `AutomaticSettings.Trigger.RUN_ALL_SAVE_TRIGGER` that tells it to automatically execute all save triggers, you have registered. This is usually what you want. 🙂
 
-Similarly there is `AutomaticSettings.Trigger.registerBeforeLoad` to let you execute stuff before any option is loaded.
+Similarly there is `AutomaticSettings.Trigger.registerBeforeLoad` to let you execute stuff before any option is loaded like modifying an option.
+
+> [!WARNING] 
+> Please notice, the `AutomaticSettings.Trigger.registerBeforeLoad`  trigger has two important differences to all others:
+> 1. It does not support [option groups](#option-groups) in the sense that you can bind it to it and they get esxecuted. Instead you have to manually bind it to the inidvidual option.
+> 2. Contrary to other triggers, it also has a different function signature for the callback. This one gets an element with all useful values.
 
 ### Overwriting loading and saving behavior
 
